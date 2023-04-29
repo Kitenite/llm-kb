@@ -1,6 +1,14 @@
-FROM python:3.10-slim 
-WORKDIR /code
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-COPY ./app /code/app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+FROM python:3.11-slim-buster
+
+WORKDIR /app
+
+ENV FLASK_APP=api/main.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=80
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 80
+COPY . .
+CMD ["flask", "run"]

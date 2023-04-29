@@ -1,4 +1,4 @@
-fastapi
-pydantic
-uvicorn
+flask
+redis
+langchain
 llama-index

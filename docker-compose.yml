@@ -1,4 +1,4 @@
-version: "3.9"
+
 services:
   web:
     build: ./flutter
@@ -9,14 +9,14 @@ services:
     
   server:
     build: ./server
-    working_dir: /code/app
-    volumes:
-      - ./server:/code
     ports:
       - "8001:80"
-    command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
     environment:
-      DEBUG: 1
-    
-  # redis:
-  #   image: "redis:alpine"
+      FLASK_DEBUG: "true"
+    volumes:
+      - ./server:/app
+      
+  redis:
+    image: "redis:alpine"
+    ports:
+        - '6379:6379' 
