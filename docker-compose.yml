@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  web:
+    build: ./flutter
+    ports:
+      - "8000:80"
+    volumes:
+      - ./flutter:/app
+    
+  server:
+    build: ./server
+    working_dir: /code/app
+    volumes:
+      - ./server:/code
+    ports:
+      - "8001:80"
+    command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
+    environment:
+      DEBUG: 1
+    
+  # redis:
+  #   image: "redis:alpine"
