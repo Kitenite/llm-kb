@@ -24,4 +24,3 @@ def query_index():
     request_query = query_text.get("query")
     response = index.query(request_query)
     return str(response), 200
-
