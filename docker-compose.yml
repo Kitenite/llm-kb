@@ -13,9 +13,10 @@ services:
       - "8001:80"
     environment:
       FLASK_DEBUG: "true"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     volumes:
       - ./server:/app
-      
+
   redis:
     image: "redis:alpine"
     ports:
