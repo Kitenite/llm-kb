@@ -19,3 +19,8 @@ This will start the following services on ports:
 - 8000: flutter client
 - 8001: flask server
 - 6379: redis database
+
+# Components
+- Client: Flutter
+- Key-value database: Redis
+- Vector database: Chroma. For now we'll use Chrome in memory but later on we can use persistent storage [with this](https://docs.trychroma.com/deployment)

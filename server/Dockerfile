@@ -6,6 +6,7 @@ ENV FLASK_APP=api/main.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=80
 
+# RUN apk add --no-cache gcc musl-dev linux-headers
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 

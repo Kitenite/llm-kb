@@ -7,17 +7,18 @@ services:
     volumes:
       - ./flutter:/app
     
-  server:
-    build: ./server
-    ports:
-      - "8001:80"
-    environment:
-      FLASK_DEBUG: "true"
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-    volumes:
-      - ./server:/app
+  # server:
+  #   build: ./server
+  #   ports:
+  #     - "8001:80"
+  #   environment:
+  #     FLASK_DEBUG: "true"
+  #     OPENAI_API_KEY: ${OPENAI_API_KEY}
+  #     CHROMA_PERSISTENT_DIR: ".chromadb/"
+  #   volumes:
+  #     - ./server:/app
 
-  redis:
-    image: "redis:alpine"
-    ports:
-        - '6379:6379' 
+  # redis:
+  #   image: "redis:alpine"
+  #   ports:
+  #       - '6379:6379' 

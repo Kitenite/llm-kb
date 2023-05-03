@@ -2,3 +2,4 @@ flask
 redis
 langchain
 llama-index
+chromadb
