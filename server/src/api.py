@@ -36,11 +36,16 @@ def create_app(test_config=None):
             return "No body provided", 400
         
         data_type = datasource.DataSourceType(json_body.get("dataType"))
-        # Switch data types
         if data_type == datasource.DataSourceType.FILE:
-            datasource.DataSourceHandler.ingest_document(json_body)
+            (result, reason) = datasource.DataSourceHandler.ingest_document(json_body.data)
         elif data_type == datasource.DataSourceType.GOOGLE_DOCS:
-            datasource.DataSourceHandler.ingest_google_docs(json_body)
-
+            (result, reason) = datasource.DataSourceHandler.ingest_google_docs(json_body.data)
+        else:
+            return "Unknown data type", 400
+        
+        if result:
+            return "Success", 200
+        else:
+            return f"Failed to handle data type {reason}", 400
     return app
 
