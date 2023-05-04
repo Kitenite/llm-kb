@@ -9,8 +9,8 @@ import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
-class MyApp extends StatelessWidget {
-  const MyApp({
+class App extends StatelessWidget {
+  const App({
     super.key,
     required this.settingsController,
   });
@@ -71,11 +71,8 @@ class MyApp extends StatelessWidget {
                 switch (routeSettings.name) {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
                   default:
-                    return FilePickerWidget();
+                    return FileUploader();
                 }
               },
             );
