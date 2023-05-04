@@ -72,5 +72,5 @@ class DataSourceType(Enum):
     """
     Enumerates the different data types that can be stored in the index.
     """
-    FILE = "FILE"
+    FILE_UPLOAD = "FILE_UPLOAD"
     GOOGLE_DOCS = "GOOGLE_DOCS"

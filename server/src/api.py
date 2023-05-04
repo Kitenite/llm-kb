@@ -1,6 +1,6 @@
 import os
 from flask import request, Flask
-import datasource
+import src.datasource as datasource
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
 def create_app(test_config=None):
@@ -36,7 +36,8 @@ def create_app(test_config=None):
             return "No body provided", 400
         
         data_type = datasource.DataSourceType(json_body.get("dataType"))
-        if data_type == datasource.DataSourceType.FILE:
+        if data_type == datasource.DataSourceType.FILE_UPLOAD:
+            print("HERE")
             (result, reason) = datasource.DataSourceHandler.ingest_document(json_body.data)
         elif data_type == datasource.DataSourceType.GOOGLE_DOCS:
             (result, reason) = datasource.DataSourceHandler.ingest_google_docs(json_body.data)

@@ -17,6 +17,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   http: ^0.13.5
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:
