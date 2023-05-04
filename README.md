@@ -15,11 +15,16 @@ In root folder:
 ```
 docker compose up
 ```
+
 This will start the following services on ports: 
 - 8000: flutter client
 - 8001: flask server
 - 6379: redis database
 
+To rebuild the app (if you make changes to the Dockerfile):
+```
+docker compose up --build
+```
 # Components
 - Client: Flutter
 - Key-value database: Redis

@@ -1,11 +1,11 @@
 
 services:
-  # web:
-  #   build: ./flutter
-  #   ports:
-  #     - "8000:80"
-  #   volumes:
-  #     - ./flutter:/app
+  web:
+    build: ./flutter
+    ports:
+      - "8000:80"
+    volumes:
+      - ./flutter:/app
     
   server:
     build: ./server
@@ -18,7 +18,7 @@ services:
     volumes:
       - ./server:/app
 
-  # redis:
-  #   image: "redis:alpine"
-  #   ports:
-  #       - '6379:6379' 
+  redis:
+    image: "redis:alpine"
+    ports:
+        - '6379:6379' 
