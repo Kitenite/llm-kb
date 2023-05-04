@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -31,17 +32,31 @@ class FileUploader extends HookWidget {
       }
     }
 
-    uploadFile() {
-      var postUri = Uri.https(Constants.serverUrl, '/ingest');
-      var request = http.MultipartRequest("POST", postUri);
-      request.fields['dataType'] = 'FILE_UPLOAD';
-      var multipartFile = http.MultipartFile.fromBytes(
-          'file', uploadedFile.value!.bytes as List<int>,
-          contentType: MediaType('txt', 'pdf'));
-      request.files.add(multipartFile);
-      request.send().then((response) {
-        if (response.statusCode == 200) print("Uploaded!");
-      }).catchError((e) => print("Error uploading file: $e"));
+    uploadFile() async {
+      var postUri = Uri.http(Constants.serverUrl, '/ingest');
+
+      final response = await http.post(
+        postUri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(
+          {
+            'dataType': 'FILE_UPLOAD',
+            'data': '{}',
+          },
+        ),
+      );
+      print(response.body);
+
+      // var request = http.MultipartRequest("POST", postUri);
+      // request.fields['dataType'] = 'FILE_UPLOAD';
+      // var multipartFile = http.MultipartFile.fromBytes(
+      //     'file', uploadedFile.value!.bytes as List<int>,
+      //     contentType: MediaType('txt', 'pdf'));
+      // request.files.add(multipartFile);
+      // request.fields['data'] = multipartFile.toString();
+      // request.send().then((response) {
+      //   if (response.statusCode == 200) print("Uploaded!");
+      // }).catchError((e) => print("Error uploading file: $e"));
     }
 
     return Scaffold(

@@ -26,11 +26,13 @@ def create_app(test_config=None):
         """
         Request body should be a JSON object with the following format:
         {
-            "dataType": "FILE",
+            "dataType": "FILE_UPLOAD",
             "data": {...}
         }
         """
-        
+        app.logger.info(request.get_json(force=True))
+        return "Baby don't hurt me", 200
+
         json_body = request.get_json(force=True) 
         if json_body is None:
             return "No body provided", 400
@@ -48,5 +50,13 @@ def create_app(test_config=None):
             return "Success", 200
         else:
             return f"Failed to handle data type {reason}", 400
+    
+    @app.after_request
+    def after_request(response):
+        header = response.headers
+        header['Access-Control-Allow-Origin'] = '*'
+        header['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        header['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, DELETE, PUT'
+        return response
     return app
 
