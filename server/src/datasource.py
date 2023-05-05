@@ -1,6 +1,7 @@
 from enum import Enum
 from llama_index import download_loader
-import json
+import os
+import sys
 
 class FileRequestObject:
     """
@@ -39,13 +40,17 @@ class DataSourceHandler:
     Handles ingestion of data from different data sources.
     """
     @staticmethod
-    def ingest_file(json_body) -> DataIngestionResponse:
+    def ingest_file(file, virtual_path) -> DataIngestionResponse:
         """
         Ingests data from a file upload
         """
-        request_object = json.loads(json_body, object_hook=lambda d: FileRequestObject(**d))
-        print(request_object.path)
-        print(request_object.data)
+        
+        local_path = os.path.join(os.getcwd(), os.getenv('LOCAL_STORAGE_DIR'), file.filename)
+        print(file, file=sys.stderr)
+        print(virtual_path, file=sys.stderr)
+        print(local_path, file=sys.stderr)
+
+        file.save(local_path)
         return DataIngestionResponse(True, "Success")
 
     @staticmethod

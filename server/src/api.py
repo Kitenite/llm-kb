@@ -20,9 +20,20 @@ def create_app(test_config=None):
             return "No query text provided", 400
         return "Baby don't hurt me"
 
+    @app.route("/ingest_file", methods=["POST"])
+    def ingest_file():
+        if 'file' not in request.files:
+            return "No file provided", 400
+        file = request.files.get("file")
+        path = request.form.get("path")
+        res = datasource.DataSourceHandler.ingest_file(file, path)
+        if res.success:
+            return res.message, 200
+        else:
+            return f"Failed to handle data type {res.message}", 400
 
     @app.route("/ingest", methods=["POST"])
-    def ingest_data():
+    def ingest_data_source():
         """
         Request body should be a JSON object with the following format:
         {
@@ -30,18 +41,12 @@ def create_app(test_config=None):
             "data": {...}
         }
         """
-        app.logger.info(request.get_json(force=True))
-        return "Baby don't hurt me", 200
-
         json_body = request.get_json(force=True) 
         if json_body is None:
             return "No body provided", 400
         
         data_type = datasource.DataSourceType(json_body.get("dataType"))
-        if data_type == datasource.DataSourceType.FILE_UPLOAD:
-            print("HERE")
-            (result, reason) = datasource.DataSourceHandler.ingest_document(json_body.data)
-        elif data_type == datasource.DataSourceType.GOOGLE_DOCS:
+        if data_type == datasource.DataSourceType.GOOGLE_DOCS:
             (result, reason) = datasource.DataSourceHandler.ingest_google_docs(json_body.data)
         else:
             return "Unknown data type", 400

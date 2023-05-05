@@ -1,0 +1,2 @@
+local_storage/*
+!local_storage/.gitkeep

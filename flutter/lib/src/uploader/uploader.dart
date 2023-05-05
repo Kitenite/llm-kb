@@ -33,30 +33,34 @@ class FileUploader extends HookWidget {
     }
 
     uploadFile() async {
-      var postUri = Uri.http(Constants.serverUrl, '/ingest');
+      var postUri = Uri.http(Constants.serverUrl, '/ingest_file');
 
-      final response = await http.post(
+      var request = http.MultipartRequest(
+        "POST",
         postUri,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(
-          {
-            'dataType': 'FILE_UPLOAD',
-            'data': '{}',
-          },
+      );
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          uploadedFile.value!.bytes!,
+          contentType: MediaType('application', 'octet-stream'),
+          filename: uploadedFile.value!.name,
         ),
       );
-      print(response.body);
+      request.fields.addAll(
+        {
+          'path': '/some/path',
+        },
+      );
+      request.headers.addAll(
+        {
+          'Content-Type': 'application/json',
+        },
+      );
 
-      // var request = http.MultipartRequest("POST", postUri);
-      // request.fields['dataType'] = 'FILE_UPLOAD';
-      // var multipartFile = http.MultipartFile.fromBytes(
-      //     'file', uploadedFile.value!.bytes as List<int>,
-      //     contentType: MediaType('txt', 'pdf'));
-      // request.files.add(multipartFile);
-      // request.fields['data'] = multipartFile.toString();
-      // request.send().then((response) {
-      //   if (response.statusCode == 200) print("Uploaded!");
-      // }).catchError((e) => print("Error uploading file: $e"));
+      var streamedResponse = await request.send();
+      var result = await http.Response.fromStream(streamedResponse);
+      print(result);
     }
 
     return Scaffold(
