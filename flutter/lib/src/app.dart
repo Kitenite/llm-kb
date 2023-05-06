@@ -68,10 +68,10 @@ class App extends StatelessWidget {
               settings: routeSettings,
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
-                  case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
+                  case SettingsPage.routeName:
+                    return SettingsPage(controller: settingsController);
                   default:
-                    return DataIngestionView();
+                    return DataIngestionPage();
                 }
               },
             );
