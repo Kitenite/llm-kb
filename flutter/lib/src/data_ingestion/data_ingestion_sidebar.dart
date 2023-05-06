@@ -16,10 +16,16 @@ class DataIngestionSideBar extends HookWidget {
   Widget buildDirectory(BuildContext context, Map<String, dynamic> data,
       ValueNotifier<MapEntry<String, int>> selectedItem,
       [double padding = 16.0]) {
+    bool isItemSelected(selectedItem, entry, padding) {
+      return selectedItem.value.key == entry.key &&
+          selectedItem.value.value == padding;
+    }
+
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: data.entries.map((entry) {
+        print(entry);
         final isFolder = entry.value is Map<String, dynamic>;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,10 +36,11 @@ class DataIngestionSideBar extends HookWidget {
                     iconColor: Theme.of(context).iconTheme.color,
                     title: ListTile(
                       contentPadding: EdgeInsets.only(left: padding),
-                      leading: Icon(Icons.folder),
+                      leading: isItemSelected(selectedItem, entry, padding)
+                          ? const Icon(Icons.folder)
+                          : const Icon(Icons.folder_outlined),
                       title: Text(entry.key),
-                      selected: selectedItem.value.key == entry.key &&
-                          selectedItem.value.value == padding,
+                      selected: isItemSelected(selectedItem, entry, padding),
                       onTap: () {
                         selectedItem.value =
                             MapEntry(entry.key, padding.toInt());
@@ -47,10 +54,11 @@ class DataIngestionSideBar extends HookWidget {
                   )
                 : ListTile(
                     contentPadding: EdgeInsets.only(left: padding + 16),
-                    leading: Icon(Icons.insert_drive_file),
+                    leading: isItemSelected(selectedItem, entry, padding)
+                        ? const Icon(Icons.insert_drive_file)
+                        : const Icon(Icons.insert_drive_file_outlined),
                     title: Text(entry.key),
-                    selected: selectedItem.value.key == entry.key &&
-                        selectedItem.value.value == padding,
+                    selected: isItemSelected(selectedItem, entry, padding),
                     onTap: () {
                       selectedItem.value = MapEntry(entry.key, padding.toInt());
                       // Handle file action
