@@ -25,7 +25,6 @@ class DataIngestionSideBar extends HookWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: data.entries.map((entry) {
-        print(entry);
         final isFolder = entry.value is Map<String, dynamic>;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +80,7 @@ class DataIngestionSideBar extends HookWidget {
         final part = parts[i];
 
         if (i == parts.length - 1) {
-          currentLevel[part] = item.isDirectory ? <String, dynamic>{} : null;
+          currentLevel[part] = item.isDirectory ? <String, dynamic>{} : item;
         } else {
           currentLevel =
               currentLevel.putIfAbsent(part, () => <String, dynamic>{});
@@ -97,7 +96,6 @@ class DataIngestionSideBar extends HookWidget {
     final selectedItem =
         useState<MapEntry<String, int>>(const MapEntry('', -1));
     final directoryStructure = buildTree(items);
-
     return SizedBox(
       width: width,
       child: SingleChildScrollView(
