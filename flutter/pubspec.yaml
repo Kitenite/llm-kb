@@ -10,6 +10,7 @@ environment:
   sdk: ">=2.19.6 <3.0.0"
 
 dependencies:
+  build_runner: ^2.3.3
   file_picker: ^5.2.11
   flutter:
     sdk: flutter
@@ -18,6 +19,7 @@ dependencies:
     sdk: flutter
   http: ^0.13.5
   http_parser: ^4.0.2
+  json_serializable: ^6.6.2
 
 dev_dependencies:
   flutter_test:
