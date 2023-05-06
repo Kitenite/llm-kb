@@ -20,9 +20,6 @@ To generate this code, run:
 flutter pub run build_runner build
 ```
 
-## Font Awesome Icons
-We'll use [Font Awesome](https://fontawesome.com/) for icons rather than Material. Browse from their home page. 
-
 ## Assets
 
 The `assets` directory houses images, fonts, and any other files you want to
