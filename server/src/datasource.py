@@ -46,11 +46,8 @@ class DataSourceHandler:
         """
         
         local_path = os.path.join(os.getcwd(), os.getenv('LOCAL_STORAGE_DIR'), file.filename)
-        print(file, file=sys.stderr)
-        print(virtual_path, file=sys.stderr)
-        print(local_path, file=sys.stderr)
-
         file.save(local_path)
+        # TODO: Send data to handler
         return DataIngestionResponse(True, "Success")
 
     @staticmethod

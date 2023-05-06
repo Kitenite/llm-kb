@@ -3,23 +3,35 @@ services:
   web:
     build: ./flutter
     ports:
-      - "8000:80"
+      - "${CLIENT_PORT}:80"
     volumes:
       - ./flutter:/app
     
   server:
     build: ./server
     ports:
-      - "8001:80"
+      - "${SERVER_PORT}:80"
     environment:
       FLASK_DEBUG: "true"
+      MONGO_HOST: "localhost"
+      MONGO_PORT: ${MONGO_PORT}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-      CHROMA_PERSISTENT_DIR: ".chromadb/"
-      LOCAL_STORAGE_DIR: "local_storage"
+      CHROMA_PERSISTENT_DIR: ${CHROMA_PERSISTENT_DIR}
+      LOCAL_STORAGE_DIR: ${LOCAL_STORAGE_DIR}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - ./server:/app
 
-  redis:
-    image: "redis:alpine"
+  mongodb:
+    image: mongo:latest
     ports:
-        - '6379:6379' 
+      - "${MONGO_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
