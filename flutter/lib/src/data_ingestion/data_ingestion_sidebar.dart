@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
-enum ItemType { FOLDER, FILE }
-
-class Item {
-  final String name;
-  final ItemType type;
-  final String uuid;
-  final String path;
-
-  Item({
-    required this.name,
-    required this.type,
-    required this.uuid,
-    required this.path,
-  });
-}
+import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class DataIngestionSideBar extends HookWidget {
   final double width;
-  final List<Item> items;
+  final List<FileSystemItem> items;
 
   const DataIngestionSideBar({
     Key? key,
@@ -31,7 +16,6 @@ class DataIngestionSideBar extends HookWidget {
   Widget buildDirectory(BuildContext context, Map<String, dynamic> data,
       ValueNotifier<MapEntry<String, int>> selectedItem,
       [double padding = 16.0]) {
-    print(selectedItem);
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -42,6 +26,8 @@ class DataIngestionSideBar extends HookWidget {
           children: [
             isFolder
                 ? ExpansionTile(
+                    textColor: Theme.of(context).textTheme.bodyLarge?.color,
+                    iconColor: Theme.of(context).iconTheme.color,
                     title: ListTile(
                       contentPadding: EdgeInsets.only(left: padding),
                       leading: Icon(Icons.folder),
@@ -76,7 +62,7 @@ class DataIngestionSideBar extends HookWidget {
     );
   }
 
-  Map<String, dynamic> buildTree(List<Item> items) {
+  Map<String, dynamic> buildTree(List<FileSystemItem> items) {
     final tree = <String, dynamic>{};
 
     for (final item in items) {
@@ -87,8 +73,7 @@ class DataIngestionSideBar extends HookWidget {
         final part = parts[i];
 
         if (i == parts.length - 1) {
-          currentLevel[part] =
-              item.type == ItemType.FOLDER ? <String, dynamic>{} : null;
+          currentLevel[part] = item.isDirectory ? <String, dynamic>{} : null;
         } else {
           currentLevel =
               currentLevel.putIfAbsent(part, () => <String, dynamic>{});
