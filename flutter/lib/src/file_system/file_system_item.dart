@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'file_system_item.g.dart';
@@ -8,17 +7,16 @@ enum FileSystemItemType {
   file,
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(explicitToJson: true, fieldRename: FieldRename.snake)
 class FileSystemItem {
   final String id;
   final String name;
   final FileSystemItemType type;
   final String parentId;
   final String path;
-  final int size;
-  final String content;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final List<String> tags;
 
   FileSystemItem({
     required this.id,
@@ -26,10 +24,9 @@ class FileSystemItem {
     required this.type,
     required this.parentId,
     required this.path,
-    required this.size,
-    required this.content,
     required this.createdAt,
     required this.updatedAt,
+    required this.tags,
   });
 
   bool get isDirectory => type == FileSystemItemType.directory;

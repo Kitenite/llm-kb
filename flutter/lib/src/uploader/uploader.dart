@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:http/http.dart' as http;
-import 'package:kb_ui/constants.dart';
-import 'package:http_parser/http_parser.dart';
+import 'package:kb_ui/src/api/server_api.dart';
 
 class FileUploader extends HookWidget {
   const FileUploader({super.key});
@@ -32,37 +27,6 @@ class FileUploader extends HookWidget {
       }
     }
 
-    uploadFile() async {
-      var postUri = Uri.http(Constants.serverUrl, '/ingest_file');
-
-      var request = http.MultipartRequest(
-        "POST",
-        postUri,
-      );
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'file',
-          uploadedFile.value!.bytes!,
-          contentType: MediaType('application', 'octet-stream'),
-          filename: uploadedFile.value!.name,
-        ),
-      );
-      request.fields.addAll(
-        {
-          'path': '/some/path',
-        },
-      );
-      request.headers.addAll(
-        {
-          'Content-Type': 'application/json',
-        },
-      );
-
-      var streamedResponse = await request.send();
-      var result = await http.Response.fromStream(streamedResponse);
-      print(result);
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pick a file'),
@@ -81,7 +45,11 @@ class FileUploader extends HookWidget {
               Text(
                   'Selected file: ${uploadedFile.value?.name ?? 'No file selected'}'),
               ElevatedButton(
-                onPressed: uploadFile,
+                onPressed: () {
+                  if (uploadedFile.value != null) {
+                    ServerApiMethods.uploadFile(uploadedFile.value!);
+                  }
+                },
                 child: const Text('uploadFile'),
               ),
             ],

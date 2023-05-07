@@ -88,16 +88,14 @@ class DataIngestionSideBar extends HookWidget {
         } else {
           if (!currentLevel.containsKey(part)) {
             final newDirectory = FileSystemItem(
-              id: '',
-              name: part,
-              type: FileSystemItemType.directory,
-              parentId: i > 0 ? parts[i - 1] : '',
-              path: parts.sublist(0, i + 1).join('/'),
-              size: 0,
-              content: '',
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            );
+                id: '',
+                name: part,
+                type: FileSystemItemType.directory,
+                parentId: i > 0 ? parts[i - 1] : '',
+                path: parts.sublist(0, i + 1).join('/'),
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+                tags: []);
 
             currentLevel[part] = FileTreeNode(item: newDirectory);
           }
@@ -115,10 +113,9 @@ class DataIngestionSideBar extends HookWidget {
         type: FileSystemItemType.directory,
         parentId: '',
         path: '',
-        size: 0,
-        content: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       children: tree,
     );

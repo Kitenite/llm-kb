@@ -1,54 +1,63 @@
-import json
-from dataclasses import dataclass
-from typing import Optional
+from enum import Enum
+from typing import List
 from datetime import datetime
 
 
-@dataclass
+class FileSystemItemType(Enum):
+    DIRECTORY = "directory"
+    FILE = "file"
+
+
 class FileSystemItem:
-    id: str
-    name: str
-    type: str
-    parent_id: Optional[str] = None
-    path: str = "/"
-    size: Optional[int] = None
-    content: Optional[str] = None
-    created_at: datetime = datetime.utcnow()
-    updated_at: datetime = datetime.utcnow()
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        type: FileSystemItemType,
+        parent_id: str,
+        path: str,
+        created_at: datetime,
+        updated_at: datetime,
+        tags: List[str],
+    ):
+        self.id = id
+        self.name = name
+        self.type = type
+        self.parent_id = parent_id
+        self.path = path
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.tags = tags
 
     @property
     def is_directory(self) -> bool:
-        return self.type == "directory"
+        return self.type == FileSystemItemType.DIRECTORY
 
     @property
     def is_file(self) -> bool:
-        return self.type == "file"
+        return self.type == FileSystemItemType.FILE
 
-    @staticmethod
-    def from_json(json_str: str) -> "FileSystemItem":
-        json_dict = json.loads(json_str)
-        return FileSystemItem(
-            id=json_dict["_id"],
-            name=json_dict["name"],
-            type=json_dict["type"],
-            parent_id=json_dict.get("parent_id"),
-            path=json_dict["path"],
-            size=json_dict.get("size"),
-            content=json_dict.get("content"),
-            created_at=datetime.fromisoformat(json_dict["created_at"]),
-            updated_at=datetime.fromisoformat(json_dict["updated_at"]),
-        )
-
-    def to_json(self) -> str:
-        json_dict = {
-            "_id": self.id,
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
             "name": self.name,
-            "type": self.type,
+            "type": self.type.value,
             "parent_id": self.parent_id,
             "path": self.path,
-            "size": self.size,
-            "content": self.content,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
+            "tags": self.tags,
         }
-        return json.dumps(json_dict)
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            type=FileSystemItemType(data["type"]),
+            parent_id=data["parent_id"],
+            path=data["path"],
+            created_at=datetime.fromisoformat(data["created_at"]),
+            updated_at=datetime.fromisoformat(data["updated_at"]),
+            tags=data["tags"],
+        )

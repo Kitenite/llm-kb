@@ -11,12 +11,11 @@ FileSystemItem _$FileSystemItemFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String,
       type: $enumDecode(_$FileSystemItemTypeEnumMap, json['type']),
-      parentId: json['parentId'] as String,
+      parentId: json['parent_id'] as String,
       path: json['path'] as String,
-      size: json['size'] as int,
-      content: json['content'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
@@ -24,12 +23,11 @@ Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
       'id': instance.id,
       'name': instance.name,
       'type': _$FileSystemItemTypeEnumMap[instance.type]!,
-      'parentId': instance.parentId,
+      'parent_id': instance.parentId,
       'path': instance.path,
-      'size': instance.size,
-      'content': instance.content,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+      'tags': instance.tags,
     };
 
 const _$FileSystemItemTypeEnumMap = {

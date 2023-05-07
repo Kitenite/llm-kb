@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:kb_ui/src/api/server_api.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_main_view.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_sidebar.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
@@ -19,10 +20,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.directory,
         parentId: '0',
         path: '/1',
-        size: 0,
-        content: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       FileSystemItem(
         id: '2',
@@ -30,10 +30,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.file,
         parentId: '1',
         path: '/1/2',
-        size: 1024,
-        content: 'Lorem ipsum dolor sit amet',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       FileSystemItem(
         id: '3',
@@ -41,10 +40,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.file,
         parentId: '1',
         path: '/1/3',
-        size: 2048,
-        content: 'Consectetur adipiscing elit',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       FileSystemItem(
         id: '4',
@@ -52,10 +50,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.directory,
         parentId: '0',
         path: '/4',
-        size: 0,
-        content: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       FileSystemItem(
         id: '5',
@@ -63,10 +60,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.file,
         parentId: '4',
         path: '/4/5',
-        size: 512,
-        content: 'Sed do eiusmod tempor incididunt',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       FileSystemItem(
         id: '6',
@@ -74,10 +70,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.directory,
         parentId: '1',
         path: '/1/6',
-        size: 0,
-        content: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
       FileSystemItem(
         id: '7',
@@ -85,10 +80,9 @@ class DataIngestionPage extends HookWidget {
         type: FileSystemItemType.file,
         parentId: '6',
         path: '/1/6/7',
-        size: 256,
-        content: 'Ut enim ad minim veniam',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        tags: [],
       ),
     ];
 
@@ -109,7 +103,11 @@ class DataIngestionPage extends HookWidget {
                     // Two icon buttons
                     IconButton(
                       icon: const Icon(Icons.note_add_outlined),
-                      onPressed: () {},
+                      onPressed: () {
+                        ServerApiMethods.uploadFileSystemItem(
+                          mockMap[selectedItem.value]!,
+                        );
+                      },
                     ),
                     IconButton(
                       icon: const Icon(Icons.create_new_folder_outlined),
