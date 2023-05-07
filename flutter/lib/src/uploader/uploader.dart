@@ -2,9 +2,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kb_ui/src/api/server_api.dart';
+import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class FileUploader extends HookWidget {
-  const FileUploader({super.key});
+  final FileSystemItem item;
+
+  const FileUploader({
+    super.key,
+    required this.item,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,35 +33,35 @@ class FileUploader extends HookWidget {
       }
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pick a file'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: pickFile,
-                child: const Text('Pick a file'),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                  'Selected file: ${uploadedFile.value?.name ?? 'No file selected'}'),
-              ElevatedButton(
-                onPressed: () {
-                  if (uploadedFile.value != null) {
-                    ServerApiMethods.uploadFile(uploadedFile.value!);
-                  }
-                },
-                child: const Text('uploadFile'),
-              ),
-            ],
-          ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Upload a file',
+          style: Theme.of(context).textTheme.headlineSmall,
         ),
-      ),
+        const SizedBox(
+          height: 10,
+        ),
+        ElevatedButton(
+          onPressed: pickFile,
+          child: const Text('Pick a file'),
+        ),
+        const SizedBox(height: 20),
+        Text(
+            'Selected file: ${uploadedFile.value?.name ?? 'No file selected'}'),
+        const SizedBox(
+          height: 10,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (uploadedFile.value != null) {
+              ServerApiMethods.uploadFile(uploadedFile.value!, item);
+            }
+          },
+          child: const Text('uploadFile'),
+        ),
+      ],
     );
   }
 }

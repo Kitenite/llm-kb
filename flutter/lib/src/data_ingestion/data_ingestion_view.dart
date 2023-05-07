@@ -10,7 +10,7 @@ class DataIngestionPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedItem = useState<String>('');
+    final selectedItem = useState<String>('1');
     final sidebarWidth = useState<double>(250);
 
     List<FileSystemItem> mockList = [

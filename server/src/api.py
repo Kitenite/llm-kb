@@ -1,6 +1,6 @@
-import os, sys
+import os, sys, json
 from flask import Flask, request
-import src.datasource as datasource
+import src.datasource.datasource_handler as datasource
 import src.datasource.file_system_item as file_system_item
 
 
@@ -27,8 +27,11 @@ def create_app(test_config=None):
         if "file" not in request.files:
             return "No file provided", 400
         file = request.files.get("file")
-        path = request.form.get("path")
-        res = datasource.DataSourceHandler.ingest_file(file, path)
+        print(request.form.get("file_system_item"), file=sys.stderr)
+        item = file_system_item.FileSystemItem.from_dict(
+            json.loads(request.form.get("file_system_item"))
+        )
+        res = datasource.DataSourceHandler.ingest_file(file, item)
         if res.success:
             return res.message, 200
         else:

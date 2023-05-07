@@ -20,8 +20,9 @@ class ServerApiMethods {
   }
 
   // Will be removed soon
-  static Future<bool> uploadFile(PlatformFile uploadedFile) async {
-    var postUri = Uri.http(Constants.serverUrl, '/create_file');
+  static Future<bool> uploadFile(
+      PlatformFile uploadedFile, FileSystemItem item) async {
+    var postUri = Uri.http(Constants.serverUrl, '/ingest_file');
 
     var request = http.MultipartRequest(
       "POST",
@@ -37,7 +38,7 @@ class ServerApiMethods {
     );
     request.fields.addAll(
       {
-        'path': '/some/path',
+        'file_system_item': jsonEncode(item.toJson()),
       },
     );
     request.headers.addAll(
