@@ -100,10 +100,34 @@ class DataIngestionPage extends HookWidget {
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DataIngestionSideBar(
-            width: sidebarWidth.value,
-            items: mockList,
-            selectedItem: selectedItem,
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    // Two icon buttons
+                    IconButton(
+                      icon: const Icon(Icons.note_add_outlined),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.create_new_folder_outlined),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+              DataIngestionSideBar(
+                width: sidebarWidth.value,
+                items: mockList,
+                selectedItem: selectedItem,
+              ),
+            ],
           ),
           MouseRegion(
             cursor: SystemMouseCursors.resizeColumn,
