@@ -3,11 +3,16 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'file_system_item.g.dart';
 
+enum FileSystemItemType {
+  directory,
+  file,
+}
+
 @JsonSerializable(explicitToJson: true)
 class FileSystemItem {
   final String id;
   final String name;
-  final String type;
+  final FileSystemItemType type;
   final String parentId;
   final String path;
   final int size;
@@ -27,8 +32,8 @@ class FileSystemItem {
     required this.updatedAt,
   });
 
-  bool get isDirectory => type == 'directory';
-  bool get isFile => type == 'file';
+  bool get isDirectory => type == FileSystemItemType.directory;
+  bool get isFile => type == FileSystemItemType.file;
 
   factory FileSystemItem.fromJson(Map<String, dynamic> json) =>
       _$FileSystemItemFromJson(json);

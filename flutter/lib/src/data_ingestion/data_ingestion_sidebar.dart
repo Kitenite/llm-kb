@@ -90,7 +90,7 @@ class DataIngestionSideBar extends HookWidget {
             final newDirectory = FileSystemItem(
               id: '',
               name: part,
-              type: 'directory',
+              type: FileSystemItemType.directory,
               parentId: i > 0 ? parts[i - 1] : '',
               path: parts.sublist(0, i + 1).join('/'),
               size: 0,
@@ -112,7 +112,7 @@ class DataIngestionSideBar extends HookWidget {
       item: FileSystemItem(
         id: '-1',
         name: 'Root',
-        type: 'directory',
+        type: FileSystemItemType.directory,
         parentId: '',
         path: '',
         size: 0,

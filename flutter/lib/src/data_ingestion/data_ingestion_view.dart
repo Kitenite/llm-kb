@@ -16,7 +16,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '1',
         name: 'Folder A',
-        type: 'directory',
+        type: FileSystemItemType.directory,
         parentId: '0',
         path: '/1',
         size: 0,
@@ -27,7 +27,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '2',
         name: 'File A1',
-        type: 'file',
+        type: FileSystemItemType.file,
         parentId: '1',
         path: '/1/2',
         size: 1024,
@@ -38,7 +38,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '3',
         name: 'File A2',
-        type: 'file',
+        type: FileSystemItemType.file,
         parentId: '1',
         path: '/1/3',
         size: 2048,
@@ -49,7 +49,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '4',
         name: 'Folder B',
-        type: 'directory',
+        type: FileSystemItemType.directory,
         parentId: '0',
         path: '/4',
         size: 0,
@@ -60,7 +60,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '5',
         name: 'File B1',
-        type: 'file',
+        type: FileSystemItemType.file,
         parentId: '4',
         path: '/4/5',
         size: 512,
@@ -71,7 +71,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '6',
         name: 'Folder C',
-        type: 'directory',
+        type: FileSystemItemType.directory,
         parentId: '1',
         path: '/1/6',
         size: 0,
@@ -82,7 +82,7 @@ class DataIngestionPage extends HookWidget {
       FileSystemItem(
         id: '7',
         name: 'File C1',
-        type: 'file',
+        type: FileSystemItemType.file,
         parentId: '6',
         path: '/1/6/7',
         size: 256,
