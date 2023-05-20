@@ -1,7 +1,7 @@
 from enum import Enum
-from llama_index import download_loader
+from llama_index import download_loader, GPTSimpleVectorIndex
 import os
-import sys
+from llama_index.vector_stores import ChromaVectorStore
 
 
 class FileRequestObject:
@@ -70,16 +70,20 @@ class DataSourceHandler:
         pass
 
     @staticmethod
-    def ingest_url(json_body):
+    def ingest_url(url, virtual_path) -> DataIngestionResponse:
         """
         Ingests data from a URL.
         """
         ReadabilityWebPageReader = download_loader("ReadabilityWebPageReader")
-        # or set proxy server for playwright: loader = ReadabilityWebPageReader(proxy="http://your-proxy-server:port")
-        # For some specific web pages, you may need to set "wait_until" to "networkidle". loader = ReadabilityWebPageReader(wait_until="networkidle")
-        loader = ReadabilityWebPageReader()
 
-        documents = loader.load_data(url=json_body.get("url"))
+        loader = ReadabilityWebPageReader(wait_until="networkidle")
+
+        documents = loader.load_data(
+            url=url,
+        )
+
+        index = GPTSimpleVectorIndex.from_documents(documents)
+        print(index.query("What was covered?"))
 
 
 class DataSourceType(Enum):
