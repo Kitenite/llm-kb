@@ -1,11 +1,13 @@
 import os, sys, json
 from flask import Flask, request
+from src.storage.storage_context import StorageContextSingleton
 import src.datasource.datasource_handler as datasource
 import src.datasource.file_system_item as file_system_item
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
 def create_app(test_config=None):
+    StorageContextSingleton.get_instance()
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
 

@@ -1,5 +1,5 @@
 flask
 langchain
 llama-index
-chromadb
+weaviate-client
 pymongo

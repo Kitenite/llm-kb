@@ -1,37 +1,7 @@
 from enum import Enum
-from llama_index import download_loader, GPTSimpleVectorIndex
+from llama_index import download_loader, GPTVectorStoreIndex
 import os
 from llama_index.vector_stores import ChromaVectorStore
-
-
-class FileRequestObject:
-    """
-    Represents a file request object.
-    """
-
-    def __init__(self, path, data):
-        self.path = path
-        self.data = data
-
-
-class GoogleDocsRequestObject:
-    """
-    Represents a file request object.
-    """
-
-    def __init__(self, path, url):
-        self.path = path
-        self.url = url
-
-
-class UrlRequestObject:
-    """
-    Represents a file request object.
-    """
-
-    def __init__(self, path, url):
-        self.path = path
-        self.url = url
 
 
 class DataIngestionResponse:
@@ -63,13 +33,6 @@ class DataSourceHandler:
         return DataIngestionResponse(True, "Success")
 
     @staticmethod
-    def ingest_google_docs(json_body):
-        """
-        Ingests data from Google Docs.
-        """
-        pass
-
-    @staticmethod
     def ingest_url(url, virtual_path) -> DataIngestionResponse:
         """
         Ingests data from a URL.
@@ -82,7 +45,7 @@ class DataSourceHandler:
             url=url,
         )
 
-        index = GPTSimpleVectorIndex.from_documents(documents)
+        index = GPTVectorStoreIndex.from_documents(documents)
         print(index.query("What was covered?"))
 
 
@@ -92,4 +55,5 @@ class DataSourceType(Enum):
     """
 
     FILE_UPLOAD = "FILE_UPLOAD"
+    LINK = "LINK"
     GOOGLE_DOCS = "GOOGLE_DOCS"

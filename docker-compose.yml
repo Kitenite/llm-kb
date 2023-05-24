@@ -1,38 +1,9 @@
 
 services:
-  client:
-    build: ./flutter
-    ports:
-      - "${LOCAL_CLIENT_PORT}:80"
-    volumes:
-      - ./flutter:/app # Hotload client code changes
-    
-  server:
-    build: ./server
-    ports:
-      - "${LOCAL_SERVER_PORT}:80"
-    environment:
-      # Keys
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      # Server config
-      FLASK_DEBUG: "true" # Hot reload server code changes
-      # Weaviate
-      WEAVIATE_PORT: ${LOCAL_WEAVIATE_PORT}
-      # File storage
-      FILE_STORAGE_DIR: ${FILE_STORAGE_DIR} # Save downloaded files here
-      # MongoDB
-      MONGO_HOST: ${LOCAL_MONGO_HOST}
-      MONGO_PORT: ${LOCAL_MONGO_PORT}
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    volumes:
-      - ./server:/app # Hot reload server code changes
-      - file_data:${FILE_STORAGE_DIR}
-
   mongodb:
     image: mongo:latest
     ports:
-      - "${LOCAL_MONGO_PORT}:27017"
+      - "${HOST_MONGO_PORT}:${CONTAINER_MONGO_PORT}"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
@@ -41,18 +12,67 @@ services:
 
   weaviate:
     image: semitechnologies/weaviate:1.19.5
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - ${CONTAINER_WEAVIATE_PORT}
+      - --scheme
+      - http
     ports:
-    - "${LOCAL_WEAVIATE_PORT}:80"
+      - "${HOST_WEAVIATE_PORT}:${CONTAINER_WEAVIATE_PORT}"
     restart: on-failure:0
     environment:
       QUERY_DEFAULTS_LIMIT: 25
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      AUTHENTICATION_APIKEY_ENABLED: 'false'
       PERSISTENCE_DATA_PATH: ${WEAVIATE_PERSISTENCE_DIR}
       DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: ''
       CLUSTER_HOSTNAME: 'node1'
     volumes:
       - weaviate_data:${WEAVIATE_PERSISTENCE_DIR}
 
+  server:
+    build: ./server
+    ports:
+      - "${HOST_SERVER_PORT}:${CONTAINER_SERVER_PORT}"
+    depends_on:
+      - mongodb
+      - weaviate
+    environment:
+      # Keys
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      
+      # Server config
+      ENV FLASK_RUN_HOST: 0.0.0.0
+      ENV FLASK_RUN_PORT: ${CONTAINER_SERVER_PORT}
+      FLASK_DEBUG: "true" # Hot reload server code changes
+      
+      # Weaviate
+      HOST_WEAVIATE_PORT: ${HOST_WEAVIATE_PORT}
+      CONTAINER_WEAVIATE_PORT: ${CONTAINER_WEAVIATE_PORT}
+      
+      # File storage
+      FILE_STORAGE_DIR: ${FILE_STORAGE_DIR} # Save downloaded files here
+      
+      # MongoDB
+      CONTAINER_MONGO_PORT: ${CONTAINER_MONGO_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - ./server:/app # Hot reload server code changes
+      - file_data:${FILE_STORAGE_DIR}
+
+  client:
+    build: ./flutter
+    depends_on:
+      - server
+    ports:
+      - "${HOST_CLIENT_PORT}:${CONTAINER_CLIENT_PORT}"
+    volumes:
+      - ./flutter:/app # Hotload client code changes
+    
 volumes:
   mongodb_data:
   weaviate_data:

@@ -29,3 +29,5 @@ docker compose up --build
 
 # Resources
 - [LlamaIndex with MongoDB](https://medium.com/llamaindex-blog/build-a-chatgpt-with-your-private-data-using-llamaindex-and-mongodb-b09850eb154c)
+- [Graph with Weaviate](https://gpt-index.readthedocs.io/en/latest/examples/composable_indices/ComposableIndices-Weaviate.html)
+- [LLM Knowledge retrieval](https://mattboegner.com/knowledge-retrieval-architecture-for-llms/)
