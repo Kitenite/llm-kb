@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_view.dart';
-import 'package:kb_ui/src/uploader/uploader.dart';
+import 'package:kb_ui/src/uploader/file_uploader.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';

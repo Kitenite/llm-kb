@@ -45,8 +45,6 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       
       # Server config
-      ENV FLASK_RUN_HOST: 0.0.0.0
-      ENV FLASK_RUN_PORT: ${CONTAINER_SERVER_PORT}
       FLASK_DEBUG: "true" # Hot reload server code changes
       
       # Weaviate

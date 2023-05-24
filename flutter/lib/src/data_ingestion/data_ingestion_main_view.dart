@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 import 'dart:convert';
-
-import 'package:kb_ui/src/uploader/uploader.dart';
+import 'package:kb_ui/src/uploader/file_uploader.dart';
+import 'package:kb_ui/src/uploader/link_uploader.dart';
 
 enum DataSourceType {
   file,
@@ -71,7 +71,7 @@ class DataIngestionMainView extends HookWidget {
                     return FileUploader(item: item);
                   case DataSourceType.link:
                     // TODO: Handle this case.
-                    return Center(child: Text('Link upload for later'));
+                    return LinkUploader(item: item);
                 }
               },
             ),

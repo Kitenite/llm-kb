@@ -1,7 +1,8 @@
 from enum import Enum
-from llama_index import download_loader, GPTVectorStoreIndex
 import os
-from llama_index.vector_stores import ChromaVectorStore
+from llama_index import download_loader, GPTVectorStoreIndex
+from src.datasource.file_system_item import FileSystemItem
+from src.storage.storage_context import StorageContextSingleton
 
 
 class DataIngestionResponse:
@@ -37,16 +38,24 @@ class DataSourceHandler:
         """
         Ingests data from a URL.
         """
+        # Decide to build tree or just one index
+
+        # Get document from link
         ReadabilityWebPageReader = download_loader("ReadabilityWebPageReader")
-
         loader = ReadabilityWebPageReader(wait_until="networkidle")
-
         documents = loader.load_data(
             url=url,
         )
 
+        # Create a FileSystemItem
+
+        # Store FileSystemItem
+
+        # Store Nodes along with metadata
+
+        storage_context = StorageContextSingleton.get_instance()
+        storage_context.docstore.add_documents(documents)
         index = GPTVectorStoreIndex.from_documents(documents)
-        print(index.query("What was covered?"))
 
 
 class DataSourceType(Enum):

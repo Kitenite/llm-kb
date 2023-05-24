@@ -13,6 +13,7 @@ class ServerApiMethods {
       'Content-Type': 'application/json; charset=UTF-8',
     };
     final body = jsonEncode(item.toJson());
+
     final response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode != 200) {
       throw Exception('Failed to upload FileSystemItem.');

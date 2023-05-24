@@ -14,8 +14,8 @@ docker compose up
 This will start the following services on ports: 
 - 8000: flutter client
 - 8001: flask server
-- 8002: mongodb database
-- 8003: weaviate database
+- 8002: weaviate database
+- 8003: mongodb database
 
 To rebuild the app (if you make changes to the Dockerfile):
 ```
