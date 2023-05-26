@@ -1,8 +1,8 @@
 from enum import Enum
 import os
 from llama_index import download_loader, GPTVectorStoreIndex
-from src.datasource.file_system_item import FileSystemItem
-from src.storage.storage_context import StorageContextSingleton
+from datasource.file_system_item import FileSystemItem
+from storage.storage_context import StorageContextSingleton
 
 
 class DataIngestionResponse:

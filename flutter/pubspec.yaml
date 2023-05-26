@@ -21,6 +21,7 @@ dependencies:
   http_parser: ^4.0.2
   json_annotation: ^4.8.1
   json_serializable: ^6.6.2
+  socket_io_client: ^2.0.2
 
 dev_dependencies:
   flutter_test:

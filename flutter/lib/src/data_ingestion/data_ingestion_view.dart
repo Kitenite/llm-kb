@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kb_ui/src/api/server_api.dart';
+import 'package:kb_ui/src/api/socket_service.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_main_view.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_sidebar.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
@@ -12,6 +15,11 @@ class DataIngestionPage extends HookWidget {
   Widget build(BuildContext context) {
     final selectedItem = useState<String>('1');
     final sidebarWidth = useState<double>(250);
+
+    SocketService.instance.listen('file_system_update', (data) {
+      print("object");
+      print('Data received: $data');
+    });
 
     List<FileSystemItem> mockList = [
       FileSystemItem(

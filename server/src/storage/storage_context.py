@@ -4,20 +4,9 @@ from llama_index.storage.docstore import MongoDocumentStore
 from llama_index.vector_stores import WeaviateVectorStore
 
 import weaviate
+from storage.mongo import build_mongodb_uri
+from storage.mongo import MongoDatabases
 import os
-from enum import Enum
-from pymongo import MongoClient
-
-
-def build_mongodb_uri(database):
-    username = os.getenv("MONGO_INITDB_ROOT_USERNAME")
-    password = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
-    host = "mongodb"
-    port = os.getenv("CONTAINER_MONGO_PORT")
-    # Build the MongoDB URI
-    uri = f"mongodb://{username}:{password}@{host}:{port}/{database}"
-
-    return uri
 
 
 class StorageContextSingleton:
@@ -45,23 +34,3 @@ class StorageContextSingleton:
                 index_store=index_store,
             )
         return cls._instance
-
-
-class MongoDBClientSingleton:
-    _instance = None
-
-    @classmethod
-    def get_instance(cls):
-        if not cls._instance:
-            cls._instance = MongoClient(build_mongodb_uri(MongoDatabases.CORPUS))
-        return cls._instance
-
-
-class MongoDatabases(Enum):
-    """
-    Enumerates the different data types that can be stored in the index.
-    """
-
-    INDICES = "indices"
-    DOCUMENTS = "documents"
-    CORPUS = "corpus"

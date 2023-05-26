@@ -8,13 +8,15 @@ import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class ServerApiMethods {
   static Future<void> uploadFileSystemItem(FileSystemItem item) async {
-    final uri = Uri.http(Constants.serverUrl, '/create_file');
+    final uri = Uri.http(ServerConstants.serverUrl,
+        ServerConstants.createFileSystemItemEndpoint);
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };
     final body = jsonEncode(item.toJson());
 
     final response = await http.post(uri, headers: headers, body: body);
+    print(response.body);
     if (response.statusCode != 200) {
       throw Exception('Failed to upload FileSystemItem.');
     }
@@ -23,7 +25,8 @@ class ServerApiMethods {
   // Will be removed soon
   static Future<bool> uploadFile(
       PlatformFile uploadedFile, FileSystemItem item) async {
-    var postUri = Uri.http(Constants.serverUrl, '/ingest_file');
+    var postUri =
+        Uri.http(ServerConstants.serverUrl, ServerConstants.ingestFileEndpoint);
 
     var request = http.MultipartRequest(
       "POST",

@@ -1,18 +1,24 @@
 import os, sys, json
 from flask import Flask, request
-from src.storage.storage_context import StorageContextSingleton
-import src.datasource.datasource_handler as datasource
-import src.datasource.file_system_item as file_system_item
+from storage.mongo import MongoDbClientSingleton
+import datasource.datasource_handler as datasource
+import datasource.file_system_item as file_system_item
 from flask_cors import CORS
+from flask_socketio import SocketIO, send, emit
+import logging
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
-def create_app(test_config=None):
+def create_app():
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
 
     # Enable CORS for local development
     CORS(app)
+    socketio = SocketIO(
+        app, cors_allowed_origins="*", async_mode="eventlet", engineio_logger=True
+    )
+    socketio.init_app(app)
 
     # @app.route("/query", methods=["POST"])
     # def query_index():
@@ -76,7 +82,47 @@ def create_app(test_config=None):
         item = file_system_item.FileSystemItem.from_dict(data)
 
         print(item, file=sys.stderr)
-        # Do something with the FileSystemItem object here
-        return "Success", 200
+        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
 
-    return app
+        result = file_system_collection.insert_one(item.to_dict())
+        return f"Inserted file system item with id: [{result.inserted_id}]", 200
+
+    @socketio.on("message")
+    def handle_message(data):
+        print("received message: " + data, file=sys.stderr)
+
+    @socketio.on("my event")
+    def handle_my_custom_event(json):
+        print("received json: " + str(json), file=sys.stderr)
+
+    @socketio.on("json")
+    def handle_json(json):
+        print("received json: " + str(json), file=sys.stderr)
+
+    @socketio.on("connect")
+    def connect():
+        emit("file_system_update", "change")
+        # emit("file_system_update", change)
+        # send("file_system_update", namespace="/file_system_update")
+        # # watch the mongodb collection for changes
+        # file_system_collection = MongoDbClientSingleton.get_file_system_collection()
+        # print(file_system_collection, file=sys.stderr)
+        # with file_system_collection.watch() as stream:
+        #     for change in stream:
+        #         print("file_system_update", file=sys.stderr)
+        #         emit("file_system_update", change)
+
+    @socketio.on("file_system_update")
+    def file_system_update():
+        print("file_system_update", file=sys.stderr)
+
+    @socketio.on("disconnect")
+    def disconnect():
+        print("Client disconnected", file=sys.stderr)
+
+    return app, socketio
+
+
+if __name__ == "__main__":
+    app, socketio = create_app()
+    socketio.run(app, host="0.0.0.0")
