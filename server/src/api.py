@@ -5,7 +5,7 @@ import datasource.datasource_handler as datasource
 import datasource.file_system_item as file_system_item
 from flask_cors import CORS
 from flask_socketio import SocketIO, send, emit
-import logging
+from bson.json_util import dumps
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
@@ -78,43 +78,19 @@ def create_app():
 
     @app.route("/create_file", methods=["POST"])
     def upload_file_system_item():
+        print("Creating file system item", file=sys.stderr)
         data = request.get_json()
         item = file_system_item.FileSystemItem.from_dict(data)
-
-        print(item, file=sys.stderr)
         file_system_collection = MongoDbClientSingleton.get_file_system_collection()
-
         result = file_system_collection.insert_one(item.to_dict())
+        f"Inserted file system item with id: [{result.inserted_id}]"
+        socketio.emit("file_system_update", item.to_dict())
+
         return f"Inserted file system item with id: [{result.inserted_id}]", 200
-
-    @socketio.on("message")
-    def handle_message(data):
-        print("received message: " + data, file=sys.stderr)
-
-    @socketio.on("my event")
-    def handle_my_custom_event(json):
-        print("received json: " + str(json), file=sys.stderr)
-
-    @socketio.on("json")
-    def handle_json(json):
-        print("received json: " + str(json), file=sys.stderr)
 
     @socketio.on("connect")
     def connect():
-        emit("file_system_update", "change")
-        # emit("file_system_update", change)
-        # send("file_system_update", namespace="/file_system_update")
-        # # watch the mongodb collection for changes
-        # file_system_collection = MongoDbClientSingleton.get_file_system_collection()
-        # print(file_system_collection, file=sys.stderr)
-        # with file_system_collection.watch() as stream:
-        #     for change in stream:
-        #         print("file_system_update", file=sys.stderr)
-        #         emit("file_system_update", change)
-
-    @socketio.on("file_system_update")
-    def file_system_update():
-        print("file_system_update", file=sys.stderr)
+        print("Client connected", file=sys.stderr)
 
     @socketio.on("disconnect")
     def disconnect():

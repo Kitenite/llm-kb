@@ -14,7 +14,6 @@ class SocketService {
 
     _socket!.onConnect((_) {
       print('Connection established');
-      _socket!.emit('my event', {"data": 'I\'m connected!'});
     });
   }
 

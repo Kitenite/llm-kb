@@ -17,7 +17,6 @@ class DataIngestionPage extends HookWidget {
     final sidebarWidth = useState<double>(250);
 
     SocketService.instance.listen('file_system_update', (data) {
-      print("object");
       print('Data received: $data');
     });
 

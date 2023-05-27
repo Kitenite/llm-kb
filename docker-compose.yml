@@ -4,11 +4,23 @@ services:
     image: mongo:latest
     ports:
       - "${HOST_MONGO_PORT}:${CONTAINER_MONGO_PORT}"
+    command: ["--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all", "--port", "${CONTAINER_MONGO_PORT}", "--keyFile", "/etc/mongo-keyfile"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongodb_data:${MONGO_PERSISTENCE_DIR}
+      - ./mongo-keyfile:/etc/mongo-keyfile
+
+  mongodb_setup:
+    image: mongo:latest
+    depends_on:
+      - mongodb
+    command: ["bash", "/mongo-setup.sh"]
+    volumes:
+      - ./mongo-setup.sh:/mongo-setup.sh
+      - ./mongo-keyfile:/etc/mongo-keyfile
+      - ./.env:/.env
 
   weaviate:
     image: semitechnologies/weaviate:1.19.5
@@ -62,14 +74,14 @@ services:
       - ./server:/app # Hot reload server code changes
       - file_data:${FILE_STORAGE_DIR}
 
-  client:
-    build: ./flutter
-    depends_on:
-      - server
-    ports:
-      - "${HOST_CLIENT_PORT}:${CONTAINER_CLIENT_PORT}"
-    volumes:
-      - ./flutter:/app # Hotload client code changes
+  # client:
+  #   build: ./flutter
+  #   depends_on:
+  #     - server
+  #   ports:
+  #     - "${HOST_CLIENT_PORT}:${CONTAINER_CLIENT_PORT}"
+  #   volumes:
+  #     - ./flutter:/app # Hotload client code changes
     
 volumes:
   mongodb_data:

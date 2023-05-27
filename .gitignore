@@ -5,6 +5,9 @@
 .env.test.local
 .env.production.local
 
+# Config
+mongo-keyfile
+
 # Python
 venv/
 *.pyc

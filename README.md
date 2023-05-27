@@ -4,6 +4,11 @@ A self-hosted solution to internal search. Answer questions about your organizat
 # Setup
 Add a `.env` file to the root of the project similar to `.env_example` 
 
+### Create mongodb keyfile
+```
+openssl rand -base64 756 > mongo-keyfile
+chmod 600 mongo-keyfile
+```
 # Run the app
 
 Make sure you have `docker compose` installed. In root folder:

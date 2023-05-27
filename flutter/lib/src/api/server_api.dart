@@ -14,7 +14,6 @@ class ServerApiMethods {
       'Content-Type': 'application/json; charset=UTF-8',
     };
     final body = jsonEncode(item.toJson());
-
     final response = await http.post(uri, headers: headers, body: body);
     print(response.body);
     if (response.statusCode != 200) {
