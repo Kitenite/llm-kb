@@ -8,12 +8,12 @@ class SocketService {
 
   // Private constructor
   SocketService._() {
-    _socket = IO.io('http://${ServerConstants.serverUrl}', <String, dynamic>{
+    _socket = IO.io('http://${ServerConstants.devServerUrl}', <String, dynamic>{
       'transports': ['websocket'],
     });
 
     _socket!.onConnect((_) {
-      print('Connection established');
+      print('Socket connection established');
     });
   }
 

@@ -15,87 +15,17 @@ class DataIngestionPage extends HookWidget {
   Widget build(BuildContext context) {
     final selectedItem = useState<String>('1');
     final sidebarWidth = useState<double>(250);
+    final fsItemsMap = useState<Map<String, FileSystemItem>>({});
 
-    SocketService.instance.listen('file_system_update', (data) {
-      print('Data received: $data');
-    });
+    useEffect(() {
+      getFileSystemItems(fsItemsMap);
 
-    List<FileSystemItem> mockList = [
-      FileSystemItem(
-        id: '1',
-        name: 'Folder A',
-        type: FileSystemItemType.directory,
-        parentId: '0',
-        path: '/1',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-      FileSystemItem(
-        id: '2',
-        name: 'File A1',
-        type: FileSystemItemType.file,
-        parentId: '1',
-        path: '/1/2',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-      FileSystemItem(
-        id: '3',
-        name: 'File A2',
-        type: FileSystemItemType.file,
-        parentId: '1',
-        path: '/1/3',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-      FileSystemItem(
-        id: '4',
-        name: 'Folder B',
-        type: FileSystemItemType.directory,
-        parentId: '0',
-        path: '/4',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-      FileSystemItem(
-        id: '5',
-        name: 'File B1',
-        type: FileSystemItemType.file,
-        parentId: '4',
-        path: '/4/5',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-      FileSystemItem(
-        id: '6',
-        name: 'Folder C',
-        type: FileSystemItemType.directory,
-        parentId: '1',
-        path: '/1/6',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-      FileSystemItem(
-        id: '7',
-        name: 'File C1',
-        type: FileSystemItemType.file,
-        parentId: '6',
-        path: '/1/6/7',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
-    ];
-
-    Map<String, FileSystemItem> mockMap = {
-      for (var item in mockList) item.id: item
-    };
+      // Listen for file system updates
+      SocketService.instance.listen('file_system_update', (data) {
+        print('Data received: $data');
+      });
+      return () {};
+    }, []); // The empty list causes this effect to run once on init
 
     return Scaffold(
       body: Row(
@@ -112,7 +42,7 @@ class DataIngestionPage extends HookWidget {
                       icon: const Icon(Icons.note_add_outlined),
                       onPressed: () {
                         ServerApiMethods.uploadFileSystemItem(
-                          mockMap[selectedItem.value]!,
+                          fsItemsMap.value[selectedItem.value]!,
                         );
                       },
                     ),
@@ -127,11 +57,15 @@ class DataIngestionPage extends HookWidget {
                   ],
                 ),
               ),
-              DataIngestionSideBar(
-                width: sidebarWidth.value,
-                items: mockList,
-                selectedItem: selectedItem,
-              ),
+              ValueListenableBuilder(
+                  valueListenable: fsItemsMap,
+                  builder: (context, value, child) {
+                    return DataIngestionSideBar(
+                      width: sidebarWidth.value,
+                      items: fsItemsMap.value.values.toList(),
+                      selectedItem: selectedItem,
+                    );
+                  }),
             ],
           ),
           MouseRegion(
@@ -149,9 +83,10 @@ class DataIngestionPage extends HookWidget {
           ValueListenableBuilder(
               valueListenable: selectedItem,
               builder: (context, value, child) {
-                if (mockMap[value] != null) {
+                if (fsItemsMap.value[value] != null) {
                   return DataIngestionMainView(
-                    item: mockMap[value] ?? mockList.first,
+                    item: fsItemsMap.value[value] ??
+                        fsItemsMap.value.values.first,
                   );
                 }
                 return const Text("No File System Item Selected");
@@ -159,5 +94,17 @@ class DataIngestionPage extends HookWidget {
         ],
       ),
     );
+  }
+
+  void getFileSystemItems(ValueNotifier<Map<String, FileSystemItem>> itemsMap) {
+    print('Getting file system items');
+    ServerApiMethods.getFileSystemItems().then((data) {
+      itemsMap.value = {
+        for (var item in data) item.id: item,
+      };
+    }).catchError((error) {
+      // Handle error here
+      print(error);
+    });
   }
 }

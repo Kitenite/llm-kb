@@ -1,5 +1,5 @@
 import os, sys, json
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from storage.mongo import MongoDbClientSingleton
 import datasource.datasource_handler as datasource
 import datasource.file_system_item as file_system_item
@@ -76,8 +76,22 @@ def create_app():
     #     else:
     #         return f"Failed to handle data type {reason}", 400
 
+    @app.route("/get_files", methods=["GET"])
+    def get_files():
+        print("Retrieving all files", file=sys.stderr)
+        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
+        all_documents = file_system_collection.find()
+        output = []
+        for document in all_documents:
+            # MongoDB includes _id field which is not serializable, so we need to remove it
+            document["_id"] = str(document["_id"])
+            output.append(document)
+        print(f"Returning documents", file=sys.stderr)
+
+        return jsonify(output), 200
+
     @app.route("/create_file", methods=["POST"])
-    def upload_file_system_item():
+    def create_file():
         print("Creating file system item", file=sys.stderr)
         data = request.get_json()
         item = file_system_item.FileSystemItem.from_dict(data)
