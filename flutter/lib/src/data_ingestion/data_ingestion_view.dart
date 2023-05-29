@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kb_ui/src/api/server_api.dart';
 import 'package:kb_ui/src/api/socket_service.dart';
-import 'package:kb_ui/src/data_ingestion/data_ingestion_main_view.dart';
+import 'package:kb_ui/src/data_ingestion/data_ingestion_create_view.dart';
+import 'package:kb_ui/src/data_ingestion/data_ingestion_edit_view.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_sidebar.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
+
+enum DataIngestionMode { view, create }
 
 class DataIngestionPage extends HookWidget {
   const DataIngestionPage({Key? key}) : super(key: key);
@@ -14,6 +17,8 @@ class DataIngestionPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final selectedItem = useState<String>('0');
+    final mode = useState<DataIngestionMode>(DataIngestionMode.view);
+
     final sidebarWidth = useState<double>(250);
     final fsItemsMap = useState<Map<String, FileSystemItem>>({});
 
@@ -43,7 +48,7 @@ class DataIngestionPage extends HookWidget {
             "empty",
           ]);
       print(newItem.toJson());
-      ServerApiMethods.uploadFileSystemItem(newItem);
+      ServerApiMethods.createFileSystemItem(newItem);
     }
 
     useEffect(() {
@@ -117,11 +122,18 @@ class DataIngestionPage extends HookWidget {
           ValueListenableBuilder(
               valueListenable: selectedItem,
               builder: (context, value, child) {
-                if (fsItemsMap.value[value] != null) {
-                  return DataIngestionMainView(
-                    item: fsItemsMap.value[value] ??
-                        fsItemsMap.value.values.first,
-                  );
+                final item = fsItemsMap.value[value];
+                if (item != null) {
+                  switch (mode.value) {
+                    case DataIngestionMode.create:
+                      return DataIngestionCreateView(
+                        item: item,
+                      );
+                    case DataIngestionMode.view:
+                      return DataIngestionEditView(
+                        item: item,
+                      );
+                  }
                 }
                 return const Text("No File System Item Selected");
               }),

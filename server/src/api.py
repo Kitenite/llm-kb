@@ -4,8 +4,8 @@ from storage.mongo import MongoDbClientSingleton
 import datasource.datasource_handler as datasource
 import datasource.file_system_item as file_system_item
 from flask_cors import CORS
-from flask_socketio import SocketIO, send, emit
-from bson.json_util import dumps
+from flask_socketio import SocketIO
+from bson.objectid import ObjectId
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
@@ -84,7 +84,7 @@ def create_app():
         output = []
         for document in all_documents:
             # MongoDB includes _id field which is not serializable, so we need to remove it
-            document["_id"] = str(document["_id"])
+            document["id"] = str(document["_id"])
             output.append(document)
         print(f"Returning {len(output)} documents", file=sys.stderr)
         return jsonify(output), 200
@@ -95,11 +95,59 @@ def create_app():
         data = request.get_json()
         item = file_system_item.FileSystemItem.from_dict(data)
         file_system_collection = MongoDbClientSingleton.get_file_system_collection()
-        result = file_system_collection.insert_one(item.to_dict())
-        f"Inserted file system item with id: [{result.inserted_id}]"
-        socketio.emit("file_system_update", item.to_dict())
+        item_dict = item.to_dict()
+        item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
+        result = file_system_collection.insert_one(item_dict)
+        print(
+            f"Inserted file system item with id: [{result.inserted_id}]",
+            file=sys.stderr,
+        )
+        socketio.emit("file_system_update", item_dict)
 
         return f"Inserted file system item with id: [{result.inserted_id}]", 200
+
+    @app.route("/update_file", methods=["POST"])
+    def update_file():
+        print("Updating file system item", file=sys.stderr)
+        data = request.get_json()
+        item = file_system_item.FileSystemItem.from_dict(data)
+        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
+
+        item_dict = item.to_dict()
+        item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
+
+        result = file_system_collection.replace_one(
+            {"_id": item_dict["_id"]}, item_dict, upsert=True
+        )
+
+        if result.upserted_id is not None:
+            print(
+                f"Inserted file system item with id: [{result.upserted_id}]",
+                file=sys.stderr,
+            )
+            socketio.emit("file_system_update", item_dict)
+            return f"Inserted file system item with id: [{result.upserted_id}]", 200
+        elif result.modified_count > 0:
+            print(
+                f"Updated file system item with id: [{item_dict['_id']}]",
+                file=sys.stderr,
+            )
+            socketio.emit("file_system_update", item_dict)
+            return f"Updated file system item with id: [{item_dict['_id']}]", 200
+        else:
+            return "An error occurred during the update.", 500
+
+    @app.route("/delete_file/<id>", methods=["DELETE"])
+    def delete_file(id):
+        print(f"Deleting file system item with id: {id}", file=sys.stderr)
+        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
+        result = file_system_collection.delete_one({"_id": id})
+        if result.deleted_count == 1:
+            print(f"Deleted file system item with id: {id}", file=sys.stderr)
+            socketio.emit("file_system_update", {"_id": id, "operation": "delete"})
+            return f"Deleted file system item with id: {id}", 200
+        else:
+            return "No file item found with this id.", 404
 
     @socketio.on("connect")
     def connect():

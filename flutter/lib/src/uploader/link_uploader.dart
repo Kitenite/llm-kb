@@ -29,7 +29,7 @@ class LinkUploader extends HookWidget {
             ]);
 
         print(newItem.toJson());
-        ServerApiMethods.uploadFileSystemItem(newItem);
+        ServerApiMethods.createFileSystemItem(newItem);
       }
     }
 

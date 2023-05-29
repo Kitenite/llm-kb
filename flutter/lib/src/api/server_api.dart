@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class ServerApiMethods {
-  static Future<void> uploadFileSystemItem(FileSystemItem item) async {
+  static Future<void> createFileSystemItem(FileSystemItem item) async {
     final uri = Uri.http(ServerConstants.devServerUrl,
         ServerConstants.createFileSystemItemEndpoint);
     final headers = <String, String>{
@@ -17,6 +17,28 @@ class ServerApiMethods {
     final response = await http.post(uri, headers: headers, body: body);
     if (response.statusCode != 200) {
       throw Exception('Failed to upload FileSystemItem.');
+    }
+  }
+
+  static Future<void> updateFileSystemItem(FileSystemItem item) async {
+    final uri = Uri.http(ServerConstants.devServerUrl,
+        ServerConstants.updateFileSystemItemEndpoint);
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    final body = jsonEncode(item.toJson());
+    final response = await http.post(uri, headers: headers, body: body);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update FileSystemItem.');
+    }
+  }
+
+  static Future<void> deleteFileSystemItem(String itemId) async {
+    final uri = Uri.http(ServerConstants.devServerUrl,
+        '${ServerConstants.deleteFileSystemItemEndpoint}/$itemId');
+    final response = await http.delete(uri);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete FileSystemItem.');
     }
   }
 

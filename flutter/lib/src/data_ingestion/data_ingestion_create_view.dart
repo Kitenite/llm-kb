@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
-import 'dart:convert';
 import 'package:kb_ui/src/uploader/file_uploader.dart';
 import 'package:kb_ui/src/uploader/link_uploader.dart';
 
@@ -10,10 +9,10 @@ enum DataSourceType {
   link,
 }
 
-class DataIngestionMainView extends HookWidget {
+class DataIngestionCreateView extends HookWidget {
   final FileSystemItem item;
 
-  const DataIngestionMainView({
+  DataIngestionCreateView({
     Key? key,
     required this.item,
   }) : super(key: key);
