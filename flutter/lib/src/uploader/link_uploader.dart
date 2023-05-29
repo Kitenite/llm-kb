@@ -21,7 +21,15 @@ class LinkUploader extends HookWidget {
       if (link.isEmpty) {
         print('No link to upload');
       } else {
-        ServerApiMethods.uploadFileSystemItem(item);
+        final newItem = FileSystemItem.createFromAnotherFileSystemItem(item,
+            name: "some_link",
+            type: FileSystemItemType.file,
+            tags: [
+              "link",
+            ]);
+
+        print(newItem.toJson());
+        ServerApiMethods.uploadFileSystemItem(newItem);
       }
     }
 
@@ -37,7 +45,7 @@ class LinkUploader extends HookWidget {
         ),
         TextField(
           controller: linkController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Enter a link',
           ),
         ),

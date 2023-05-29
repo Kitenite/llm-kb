@@ -20,9 +20,7 @@ class DataIngestionMainView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    const encoder = JsonEncoder.withIndent('  ');
-    final prettyJson = encoder.convert(item);
-    final dataSource = useState<DataSourceType>(DataSourceType.file);
+    final dataSource = useState<DataSourceType>(DataSourceType.link);
     return Expanded(
       child: Column(
         children: [
@@ -70,7 +68,6 @@ class DataIngestionMainView extends HookWidget {
                   case DataSourceType.file:
                     return FileUploader(item: item);
                   case DataSourceType.link:
-                    // TODO: Handle this case.
                     return LinkUploader(item: item);
                 }
               },

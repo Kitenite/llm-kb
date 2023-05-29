@@ -13,16 +13,46 @@ class DataIngestionPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedItem = useState<String>('1');
+    final selectedItem = useState<String>('0');
     final sidebarWidth = useState<double>(250);
     final fsItemsMap = useState<Map<String, FileSystemItem>>({});
 
+    void getFileSystemItems() {
+      print('Getting file system items');
+      ServerApiMethods.getFileSystemItems().then((data) {
+        for (var item in data) print(item.toJson());
+        fsItemsMap.value = {
+          for (var item in data) item.id: item,
+        };
+      }).catchError((error) {
+        // Handle error here
+        print(error);
+      });
+    }
+
+    void createNewFileSystemItem(FileSystemItemType type) {
+      print(selectedItem.value);
+      final selectedFsItem =
+          fsItemsMap.value[selectedItem.value] ?? FileSystemItem.getRootItem();
+
+      final newItem = FileSystemItem.createFromAnotherFileSystemItem(
+          selectedFsItem,
+          name: type == FileSystemItemType.file ? "new_file" : "new_dir",
+          type: type,
+          tags: [
+            "empty",
+          ]);
+      print(newItem.toJson());
+      ServerApiMethods.uploadFileSystemItem(newItem);
+    }
+
     useEffect(() {
-      getFileSystemItems(fsItemsMap);
+      getFileSystemItems();
 
       // Listen for file system updates
       SocketService.instance.listen('file_system_update', (data) {
-        print('Data received: $data');
+        print('file_system_update received');
+        getFileSystemItems();
       });
       return () {};
     }, []); // The empty list causes this effect to run once on init
@@ -31,42 +61,46 @@ class DataIngestionPage extends HookWidget {
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    // Two icon buttons
-                    IconButton(
-                      icon: const Icon(Icons.note_add_outlined),
-                      onPressed: () {
-                        ServerApiMethods.uploadFileSystemItem(
-                          fsItemsMap.value[selectedItem.value]!,
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.create_new_folder_outlined),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: () {},
-                    ),
-                  ],
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      // Two icon buttons
+                      IconButton(
+                        icon: const Icon(Icons.note_add_outlined),
+                        onPressed: () {
+                          createNewFileSystemItem(FileSystemItemType.file);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.create_new_folder_outlined),
+                        onPressed: () {
+                          createNewFileSystemItem(FileSystemItemType.directory);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.refresh),
+                        onPressed: () {
+                          getFileSystemItems();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              ValueListenableBuilder(
-                  valueListenable: fsItemsMap,
-                  builder: (context, value, child) {
-                    return DataIngestionSideBar(
-                      width: sidebarWidth.value,
-                      items: fsItemsMap.value.values.toList(),
-                      selectedItem: selectedItem,
-                    );
-                  }),
-            ],
+                ValueListenableBuilder(
+                    valueListenable: fsItemsMap,
+                    builder: (context, value, child) {
+                      return DataIngestionSideBar(
+                        width: sidebarWidth.value,
+                        items: fsItemsMap.value.values.toList(),
+                        selectedItem: selectedItem,
+                      );
+                    }),
+              ],
+            ),
           ),
           MouseRegion(
             cursor: SystemMouseCursors.resizeColumn,
@@ -94,17 +128,5 @@ class DataIngestionPage extends HookWidget {
         ],
       ),
     );
-  }
-
-  void getFileSystemItems(ValueNotifier<Map<String, FileSystemItem>> itemsMap) {
-    print('Getting file system items');
-    ServerApiMethods.getFileSystemItems().then((data) {
-      itemsMap.value = {
-        for (var item in data) item.id: item,
-      };
-    }).catchError((error) {
-      // Handle error here
-      print(error);
-    });
   }
 }

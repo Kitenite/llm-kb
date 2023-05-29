@@ -25,7 +25,7 @@ class DataIngestionSideBar extends HookWidget {
 
     return ListView(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       children: root.children.entries.map((entry) {
         final isFolder = entry.value.item.isDirectory;
         return Column(
@@ -107,16 +107,7 @@ class DataIngestionSideBar extends HookWidget {
 
     // Create a root FileTreeItem to hold the tree.values.toList()
     return FileTreeNode(
-      item: FileSystemItem(
-        id: '-1',
-        name: 'Root',
-        type: FileSystemItemType.directory,
-        parentId: '',
-        path: '',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        tags: [],
-      ),
+      item: FileSystemItem.getRootItem(),
       children: tree,
     );
   }

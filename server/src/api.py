@@ -86,8 +86,7 @@ def create_app():
             # MongoDB includes _id field which is not serializable, so we need to remove it
             document["_id"] = str(document["_id"])
             output.append(document)
-        print(f"Returning documents", file=sys.stderr)
-
+        print(f"Returning {len(output)} documents", file=sys.stderr)
         return jsonify(output), 200
 
     @app.route("/create_file", methods=["POST"])
