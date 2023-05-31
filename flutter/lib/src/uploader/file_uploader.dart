@@ -56,7 +56,21 @@ class FileUploader extends HookWidget {
         ElevatedButton(
           onPressed: () {
             if (uploadedFile.value != null) {
-              ServerApiMethods.uploadFile(uploadedFile.value!, item);
+              ServerApiMethods.uploadFile(uploadedFile.value!).then((fileId) {
+                print("File uploaded with id $fileId");
+
+                final newItem = FileSystemItem.createFromAnotherFileSystemItem(
+                    item,
+                    name: "New pdf",
+                    type: FileSystemItemType.pdf,
+                    fsId: fileId,
+                    tags: [
+                      "pdf",
+                    ]);
+
+                print(newItem.toJson());
+                ServerApiMethods.createFileSystemItem(newItem);
+              });
             }
           },
           child: const Text('uploadFile'),

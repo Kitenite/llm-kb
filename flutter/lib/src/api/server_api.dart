@@ -56,9 +56,7 @@ class ServerApiMethods {
     }
   }
 
-  // Will be removed soon
-  static Future<bool> uploadFile(
-      PlatformFile uploadedFile, FileSystemItem item) async {
+  static Future<String?> uploadFile(PlatformFile uploadedFile) async {
     var postUri = Uri.http(
         ServerConstants.devServerUrl, ServerConstants.ingestFileEndpoint);
 
@@ -74,20 +72,16 @@ class ServerApiMethods {
         filename: uploadedFile.name,
       ),
     );
-    request.fields.addAll(
-      {
-        'file_system_item': jsonEncode(item.toJson()),
-      },
-    );
-    request.headers.addAll(
-      {
-        'Content-Type': 'application/json',
-      },
-    );
 
     var streamedResponse = await request.send();
     var result = await http.Response.fromStream(streamedResponse);
-    print(result.body);
-    return Future.value(result.statusCode == 200);
+
+    if (result.statusCode == 200) {
+      var responseBody = jsonDecode(result.body);
+      return responseBody['file_id'];
+    } else {
+      print(result.body);
+      return null;
+    }
   }
 }

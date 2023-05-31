@@ -20,6 +20,7 @@ class FileSystemItem {
   final DateTime updatedAt;
   final List<String> tags;
   final String? url;
+  final String? fsId; // the id of the document in the file system
 
   FileSystemItem({
     required this.id,
@@ -31,6 +32,7 @@ class FileSystemItem {
     required this.updatedAt,
     required this.tags,
     this.url,
+    this.fsId,
   });
 
   bool get isDirectory => type == FileSystemItemType.directory;
@@ -42,7 +44,8 @@ class FileSystemItem {
       {required String name,
       required FileSystemItemType type,
       required List<String> tags,
-      String? url}) {
+      String? url,
+      String? fsId}) {
     String id = const Uuid().v4();
     String parentId =
         !anotherItem.isDirectory ? anotherItem.parentId : anotherItem.id;
@@ -60,6 +63,7 @@ class FileSystemItem {
       updatedAt: DateTime.now(),
       tags: tags,
       url: url,
+      fsId: fsId, // added fsId parameter
     );
   }
 

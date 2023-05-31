@@ -59,8 +59,27 @@ class File:
 
 
 class PdfFile(File):
-    def __init__(self, **kwargs):
+    def __init__(self, fs_id: Optional[str] = None, **kwargs):
         super().__init__(type=FileType.PDF, **kwargs)
+        self.fs_id = fs_id  # the id of the document in the file system
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["fs_id"] = self.fs_id
+        return result
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            fs_id=data.get("fs_id"),  # .get() is used here in case fs_id is not present
+            id=data["id"],
+            name=data["name"],
+            parent_id=data["parent_id"],
+            path=data["path"],
+            created_at=datetime.fromisoformat(data["created_at"]),
+            updated_at=datetime.fromisoformat(data["updated_at"]),
+            tags=data["tags"],
+        )
 
 
 class LinkFile(File):
