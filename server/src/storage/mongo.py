@@ -1,6 +1,8 @@
 from enum import Enum
 from pymongo import MongoClient
+from gridfs import GridFS
 import os
+from bson.objectid import ObjectId
 
 
 class MongoDatabases(Enum):
@@ -49,3 +51,16 @@ class MongoDbClientSingleton:
         return cls.get_instance()[MongoDatabases.CORPUS.value][
             MongoCollections.FILE_SYSTEM.value
         ]
+
+    @classmethod
+    def get_gridfs_instance(cls, database: MongoDatabases):
+        return GridFS(cls.get_instance()[database.value])
+
+    @classmethod
+    def get_document_fs(cls):
+        return cls.get_gridfs_instance(MongoDatabases.DOCUMENTS)
+
+    @classmethod
+    def get_document(cls, file_id: str):
+        fs = cls.get_document_fs()
+        return fs.get(ObjectId(file_id))

@@ -6,6 +6,7 @@ from datasource.file_system import File, Directory, FileType, PdfFile, LinkFile
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from bson.objectid import ObjectId
+from werkzeug.utils import secure_filename
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
@@ -33,20 +34,23 @@ def create_app():
     #         return "No query text provided", 400
     #     return "Baby don't hurt me"
 
-    # @app.route("/ingest_file", methods=["POST"])
-    # def ingest_file():
-    #     if "file" not in request.files:
-    #         return "No file provided", 400
-    #     file = request.files.get("file")
-    #     print(request.form.get("file_system_item"), file=sys.stderr)
-    #     item = file_system_item.FileSystemItem.from_dict(
-    #         json.loads(request.form.get("file_system_item"))
-    #     )
-    #     res = datasource.DataSourceHandler.ingest_file(file, item)
-    #     if res.success:
-    #         return res.message, 200
-    #     else:
-    #         return f"Failed to handle data type {res.message}", 400
+    @app.route("/ingest_file", methods=["POST"])
+    def ingest_file():
+        if "file" not in request.files:
+            return "No file provided", 400
+
+        file = request.files["file"]
+        file.filename = secure_filename(file.filename)
+
+        try:
+            # Get the GridFS instance for the CORPUS database
+            fs = MongoDbClientSingleton.get_document_fs()
+
+            # Save the file to MongoDB and get its id
+            file_id = fs.put(file)
+            return jsonify({"file_id": str(file_id)}), 200
+        except Exception as e:
+            return f"Failed to store file: {str(e)}", 400
 
     # @app.route("/ingest", methods=["POST"])
     # def ingest_data_source():
