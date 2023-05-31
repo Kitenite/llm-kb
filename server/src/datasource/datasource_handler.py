@@ -1,7 +1,6 @@
 from enum import Enum
 import os
 from llama_index import download_loader, GPTVectorStoreIndex
-from datasource.file_system_item import FileSystemItem
 from storage.storage_context import StorageContextSingleton
 
 

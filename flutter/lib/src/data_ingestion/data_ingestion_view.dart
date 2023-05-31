@@ -9,7 +9,10 @@ import 'package:kb_ui/src/data_ingestion/data_ingestion_edit_view.dart';
 import 'package:kb_ui/src/data_ingestion/data_ingestion_sidebar.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 
-enum DataIngestionMode { view, create }
+enum DataIngestionMode {
+  view,
+  create,
+}
 
 class DataIngestionPage extends HookWidget {
   const DataIngestionPage({Key? key}) : super(key: key);
@@ -42,7 +45,8 @@ class DataIngestionPage extends HookWidget {
 
       final newItem = FileSystemItem.createFromAnotherFileSystemItem(
           selectedFsItem,
-          name: type == FileSystemItemType.file ? "new_file" : "new_dir",
+          name:
+              type == FileSystemItemType.directory ? "New folder" : "New file",
           type: type,
           tags: [
             "empty",
@@ -74,11 +78,11 @@ class DataIngestionPage extends HookWidget {
                   child: Row(
                     children: [
                       // Two icon buttons
-                      IconButton(
-                        icon: const Icon(Icons.note_add_outlined),
+                      ElevatedButton(
                         onPressed: () {
-                          createNewFileSystemItem(FileSystemItemType.file);
+                          mode.value = DataIngestionMode.create;
                         },
+                        child: Text('Add data'),
                       ),
                       IconButton(
                         icon: const Icon(Icons.create_new_folder_outlined),
@@ -99,10 +103,10 @@ class DataIngestionPage extends HookWidget {
                     valueListenable: fsItemsMap,
                     builder: (context, value, child) {
                       return DataIngestionSideBar(
-                        width: sidebarWidth.value,
-                        items: fsItemsMap.value.values.toList(),
-                        selectedItem: selectedItem,
-                      );
+                          width: sidebarWidth.value,
+                          items: fsItemsMap.value.values.toList(),
+                          selectedItem: selectedItem,
+                          mode: mode);
                     }),
               ],
             ),
@@ -122,20 +126,18 @@ class DataIngestionPage extends HookWidget {
           ValueListenableBuilder(
               valueListenable: selectedItem,
               builder: (context, value, child) {
-                final item = fsItemsMap.value[value];
-                if (item != null) {
-                  switch (mode.value) {
-                    case DataIngestionMode.create:
-                      return DataIngestionCreateView(
-                        item: item,
-                      );
-                    case DataIngestionMode.view:
-                      return DataIngestionEditView(
-                        item: item,
-                      );
-                  }
+                final item =
+                    fsItemsMap.value[value] ?? FileSystemItem.getRootItem();
+                switch (mode.value) {
+                  case DataIngestionMode.create:
+                    return DataIngestionCreateView(
+                      item: item,
+                    );
+                  case DataIngestionMode.view:
+                    return DataIngestionEditView(
+                      item: item,
+                    );
                 }
-                return const Text("No File System Item Selected");
               }),
         ],
       ),

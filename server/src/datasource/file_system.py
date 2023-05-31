@@ -1,19 +1,22 @@
 from enum import Enum
 from typing import List
 from datetime import datetime
+from typing import Optional
 
 
-class FileSystemItemType(Enum):
+class FileType(Enum):
+    PDF = "pdf"
+    LINK = "link"
     DIRECTORY = "directory"
-    FILE = "file"
+    GENERIC = "generic"
 
 
-class FileSystemItem:
+class File:
     def __init__(
         self,
         id: str,
         name: str,
-        type: FileSystemItemType,
+        type: FileType,
         parent_id: str,
         path: str,
         created_at: datetime,
@@ -28,14 +31,6 @@ class FileSystemItem:
         self.created_at = created_at
         self.updated_at = updated_at
         self.tags = tags
-
-    @property
-    def is_directory(self) -> bool:
-        return self.type == FileSystemItemType.DIRECTORY
-
-    @property
-    def is_file(self) -> bool:
-        return self.type == FileSystemItemType.FILE
 
     def to_dict(self) -> dict:
         return {
@@ -54,10 +49,44 @@ class FileSystemItem:
         return cls(
             id=data["id"],
             name=data["name"],
-            type=FileSystemItemType(data["type"]),
+            type=FileType(data["type"]),
             parent_id=data["parent_id"],
             path=data["path"],
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
         )
+
+
+class PdfFile(File):
+    def __init__(self, **kwargs):
+        super().__init__(type=FileType.PDF, **kwargs)
+
+
+class LinkFile(File):
+    def __init__(self, url: str, **kwargs):
+        super().__init__(type=FileType.LINK, **kwargs)
+        self.url = url
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["url"] = self.url
+        return result
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            url=data["url"],
+            id=data["id"],
+            name=data["name"],
+            parent_id=data["parent_id"],
+            path=data["path"],
+            created_at=datetime.fromisoformat(data["created_at"]),
+            updated_at=datetime.fromisoformat(data["updated_at"]),
+            tags=data["tags"],
+        )
+
+
+class Directory(File):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

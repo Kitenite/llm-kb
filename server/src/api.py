@@ -2,7 +2,7 @@ import os, sys, json
 from flask import Flask, request, jsonify
 from storage.mongo import MongoDbClientSingleton
 import datasource.datasource_handler as datasource
-import datasource.file_system_item as file_system_item
+from datasource.file_system import File, Directory, FileType, PdfFile, LinkFile
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from bson.objectid import ObjectId
@@ -85,7 +85,17 @@ def create_app():
         for document in all_documents:
             # MongoDB includes _id field which is not serializable, so we need to remove it
             document["id"] = str(document["_id"])
-            output.append(document)
+            # Convert the document to a File object
+            file_type = FileType(document.get("type"))
+            if file_type == FileType.DIRECTORY:
+                file_obj = Directory.from_dict(document)
+            elif file_type == FileType.PDF:
+                file_obj = PdfFile.from_dict(document)
+            elif file_type == FileType.LINK:
+                file_obj = LinkFile.from_dict(document)
+            else:
+                file_obj = File.from_dict(document)
+            output.append(file_obj.to_dict())
         print(f"Returning {len(output)} documents", file=sys.stderr)
         return jsonify(output), 200
 
@@ -93,7 +103,17 @@ def create_app():
     def create_file():
         print("Creating file system item", file=sys.stderr)
         data = request.get_json()
-        item = file_system_item.FileSystemItem.from_dict(data)
+        # Convert the data to a File object
+        file_type = FileType(data.get("type"))
+        if file_type == FileType.DIRECTORY:
+            print(data, file=sys.stderr)
+            item = Directory.from_dict(data)
+        elif file_type == FileType.PDF:
+            item = PdfFile.from_dict(data)
+        elif file_type == FileType.LINK:
+            item = LinkFile.from_dict(data)
+        else:
+            item = File.from_dict(data)
         file_system_collection = MongoDbClientSingleton.get_file_system_collection()
         item_dict = item.to_dict()
         item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
@@ -110,7 +130,16 @@ def create_app():
     def update_file():
         print("Updating file system item", file=sys.stderr)
         data = request.get_json()
-        item = file_system_item.FileSystemItem.from_dict(data)
+        # Convert the data to a File object
+        file_type = FileType(data.get("type"))
+        if file_type == FileType.DIRECTORY:
+            item = Directory.from_dict(data)
+        elif file_type == FileType.PDF:
+            item = PdfFile.from_dict(data)
+        elif file_type == FileType.LINK:
+            item = LinkFile.from_dict(data)
+        else:
+            item = File.from_dict(data)
         file_system_collection = MongoDbClientSingleton.get_file_system_collection()
 
         item_dict = item.to_dict()

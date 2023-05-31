@@ -16,6 +16,7 @@ FileSystemItem _$FileSystemItemFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
+      url: json['url'] as String?,
     );
 
 Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
@@ -28,9 +29,11 @@ Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt.toIso8601String(),
       'tags': instance.tags,
+      'url': instance.url,
     };
 
 const _$FileSystemItemTypeEnumMap = {
   FileSystemItemType.directory: 'directory',
-  FileSystemItemType.file: 'file',
+  FileSystemItemType.pdf: 'pdf',
+  FileSystemItemType.link: 'link',
 };

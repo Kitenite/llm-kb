@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:kb_ui/src/data_ingestion/data_ingestion_view.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 import 'package:kb_ui/src/file_system/file_tree_item.dart';
 
@@ -7,12 +8,14 @@ class DataIngestionSideBar extends HookWidget {
   final double width;
   final List<FileSystemItem> items;
   final ValueNotifier<String> selectedItem;
+  final ValueNotifier<DataIngestionMode> mode;
 
   const DataIngestionSideBar({
     Key? key,
     required this.width,
     required this.items,
     required this.selectedItem,
+    required this.mode,
   }) : super(key: key);
 
   // Recursive function to build the directory structure
@@ -21,6 +24,29 @@ class DataIngestionSideBar extends HookWidget {
       [double padding = 16.0]) {
     bool isItemSelected(selectedItem, entry) {
       return selectedItem.value == entry.item.id;
+    }
+
+    Icon getIconForFileSystemItem(FileSystemItem item,
+        {bool isOutlined = false}) {
+      IconData iconData;
+      switch (item.type) {
+        case FileSystemItemType.directory:
+          iconData = isOutlined ? Icons.folder_outlined : Icons.folder;
+          break;
+        case FileSystemItemType.pdf:
+          iconData =
+              isOutlined ? Icons.picture_as_pdf_outlined : Icons.picture_as_pdf;
+          break;
+        case FileSystemItemType.link:
+          iconData = isOutlined ? Icons.link : Icons.link;
+          break;
+        default:
+          iconData = isOutlined
+              ? Icons.insert_drive_file_outlined
+              : Icons.insert_drive_file;
+          break;
+      }
+      return Icon(iconData);
     }
 
     return ListView(
@@ -38,15 +64,16 @@ class DataIngestionSideBar extends HookWidget {
                     iconColor: Theme.of(context).iconTheme.color,
                     title: ListTile(
                       contentPadding: EdgeInsets.only(left: padding),
-                      leading: isItemSelected(selectedItem, entry.value)
-                          ? const Icon(Icons.folder)
-                          : const Icon(Icons.folder_outlined),
+                      leading: getIconForFileSystemItem(entry.value.item,
+                          isOutlined:
+                              !isItemSelected(selectedItem, entry.value)),
                       title: Text(entry.value.item.name == ''
                           ? root.item.name
                           : entry.value.item.name),
                       selected: isItemSelected(selectedItem, entry.value),
                       onTap: () {
                         selectedItem.value = entry.value.item.id;
+                        mode.value = DataIngestionMode.view;
                         // Handle folder navigation or action
                       },
                     ),
@@ -57,13 +84,13 @@ class DataIngestionSideBar extends HookWidget {
                   )
                 : ListTile(
                     contentPadding: EdgeInsets.only(left: padding + 16),
-                    leading: isItemSelected(selectedItem, entry.value)
-                        ? const Icon(Icons.insert_drive_file)
-                        : const Icon(Icons.insert_drive_file_outlined),
+                    leading: getIconForFileSystemItem(entry.value.item,
+                        isOutlined: !isItemSelected(selectedItem, entry.value)),
                     title: Text(entry.value.item.name),
                     selected: isItemSelected(selectedItem, entry.value),
                     onTap: () {
                       selectedItem.value = entry.value.item.id;
+                      mode.value = DataIngestionMode.view;
                       // Handle file action
                     },
                   ),

@@ -5,7 +5,8 @@ part 'file_system_item.g.dart';
 
 enum FileSystemItemType {
   directory,
-  file,
+  pdf,
+  link,
 }
 
 @JsonSerializable(explicitToJson: true, fieldRename: FieldRename.snake)
@@ -18,6 +19,7 @@ class FileSystemItem {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<String> tags;
+  final String? url;
 
   FileSystemItem({
     required this.id,
@@ -28,20 +30,23 @@ class FileSystemItem {
     required this.createdAt,
     required this.updatedAt,
     required this.tags,
+    this.url,
   });
 
   bool get isDirectory => type == FileSystemItemType.directory;
-  bool get isFile => type == FileSystemItemType.file;
+  bool get isPdf => type == FileSystemItemType.pdf;
+  bool get isLink => type == FileSystemItemType.link;
 
   static FileSystemItem createFromAnotherFileSystemItem(
       FileSystemItem anotherItem,
       {required String name,
       required FileSystemItemType type,
-      required List<String> tags}) {
+      required List<String> tags,
+      String? url}) {
     String id = const Uuid().v4();
     String parentId =
-        anotherItem.isFile ? anotherItem.parentId : anotherItem.id;
-    String path = anotherItem.isFile
+        !anotherItem.isDirectory ? anotherItem.parentId : anotherItem.id;
+    String path = !anotherItem.isDirectory
         ? "${anotherItem.path.substring(0, anotherItem.path.lastIndexOf("/"))}/$id"
         : "${anotherItem.path}/$id";
 
@@ -54,6 +59,7 @@ class FileSystemItem {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       tags: tags,
+      url: url,
     );
   }
 
@@ -66,21 +72,7 @@ class FileSystemItem {
       path: '',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      tags: [],
-    );
-  }
-
-  static FileSystemItem createDefaultDir() {
-    String id = const Uuid().v4();
-    return FileSystemItem(
-      id: id,
-      name: 'your_first_dir',
-      type: FileSystemItemType.directory,
-      parentId: '0',
-      path: '/$id',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      tags: ['default'],
+      tags: ['root'],
     );
   }
 

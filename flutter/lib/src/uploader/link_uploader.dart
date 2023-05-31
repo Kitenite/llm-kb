@@ -22,8 +22,9 @@ class LinkUploader extends HookWidget {
         print('No link to upload');
       } else {
         final newItem = FileSystemItem.createFromAnotherFileSystemItem(item,
-            name: "some_link",
-            type: FileSystemItemType.file,
+            name: "New link",
+            type: FileSystemItemType.link,
+            url: linkController.text,
             tags: [
               "link",
             ]);
