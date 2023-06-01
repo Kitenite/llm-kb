@@ -33,18 +33,14 @@ class DataIngestionEditView extends HookWidget {
             decoration: InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                    color: !isValidJson.value ? Colors.red : Colors.blue),
+                    color: isValidJson.value ? Colors.blue : Colors.red),
               ),
               border: const OutlineInputBorder(),
               labelText: 'JSON Input',
+              errorText: isValidJson.value ? null : 'Invalid json',
             ),
             onChanged: (value) => isValidJson.value = validateJson(value),
           ),
-          if (!isValidJson.value)
-            const Text(
-              'Invalid JSON input',
-              style: TextStyle(color: Colors.red, fontSize: 16),
-            ),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

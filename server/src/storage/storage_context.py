@@ -5,7 +5,6 @@ from llama_index.vector_stores import WeaviateVectorStore
 
 import weaviate
 from storage.mongo import build_mongodb_uri
-from storage.mongo import MongoDatabases
 import os
 
 
@@ -20,12 +19,8 @@ class StorageContextSingleton:
             weaviate_client = weaviate.Client(url=f"http://weaviate:{weaviate_port}")
 
             # Create storage context
-            docstore = MongoDocumentStore.from_uri(
-                uri=build_mongodb_uri(MongoDatabases.DOCUMENTS)
-            )
-            index_store = MongoIndexStore.from_uri(
-                uri=build_mongodb_uri(MongoDatabases.INDICES)
-            )
+            docstore = MongoDocumentStore.from_uri(uri=build_mongodb_uri())
+            index_store = MongoIndexStore.from_uri(uri=build_mongodb_uri())
             vector_store = WeaviateVectorStore(weaviate_client=weaviate_client)
 
             cls._instance = StorageContext.from_defaults(

@@ -18,6 +18,7 @@ FileSystemItem _$FileSystemItemFromJson(Map<String, dynamic> json) =>
       tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
       url: json['url'] as String?,
       fsId: json['fs_id'] as String?,
+      processed: json['processed'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
@@ -32,6 +33,7 @@ Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
       'tags': instance.tags,
       'url': instance.url,
       'fs_id': instance.fsId,
+      'processed': instance.processed,
     };
 
 const _$FileSystemItemTypeEnumMap = {

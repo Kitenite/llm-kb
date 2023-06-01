@@ -58,7 +58,7 @@ class ServerApiMethods {
 
   static Future<String?> uploadFile(PlatformFile uploadedFile) async {
     var postUri = Uri.http(
-        ServerConstants.devServerUrl, ServerConstants.ingestFileEndpoint);
+        ServerConstants.devServerUrl, ServerConstants.uploadFileEndpoint);
 
     var request = http.MultipartRequest(
       "POST",

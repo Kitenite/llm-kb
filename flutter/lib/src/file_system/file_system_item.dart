@@ -21,6 +21,7 @@ class FileSystemItem {
   final List<String> tags;
   final String? url;
   final String? fsId; // the id of the document in the file system
+  final bool processed; // new field
 
   FileSystemItem({
     required this.id,
@@ -33,6 +34,7 @@ class FileSystemItem {
     required this.tags,
     this.url,
     this.fsId,
+    this.processed = false,
   });
 
   bool get isDirectory => type == FileSystemItemType.directory;
@@ -40,12 +42,13 @@ class FileSystemItem {
   bool get isLink => type == FileSystemItemType.link;
 
   static FileSystemItem createFromAnotherFileSystemItem(
-      FileSystemItem anotherItem,
-      {required String name,
-      required FileSystemItemType type,
-      required List<String> tags,
-      String? url,
-      String? fsId}) {
+    FileSystemItem anotherItem, {
+    required String name,
+    required FileSystemItemType type,
+    required List<String> tags,
+    String? url,
+    String? fsId,
+  }) {
     String id = const Uuid().v4();
     String parentId =
         !anotherItem.isDirectory ? anotherItem.parentId : anotherItem.id;
@@ -64,6 +67,7 @@ class FileSystemItem {
       tags: tags,
       url: url,
       fsId: fsId, // added fsId parameter
+      processed: false, // initialize the new field
     );
   }
 
@@ -77,6 +81,7 @@ class FileSystemItem {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       tags: ['root'],
+      processed: true,
     );
   }
 

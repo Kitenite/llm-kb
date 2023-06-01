@@ -22,6 +22,7 @@ class File:
         created_at: datetime,
         updated_at: datetime,
         tags: List[str],
+        processed: bool,
     ):
         self.id = id
         self.name = name
@@ -31,6 +32,19 @@ class File:
         self.created_at = created_at
         self.updated_at = updated_at
         self.tags = tags
+        self.processed = processed
+
+    @staticmethod
+    def from_dict_factory(data: dict):
+        file_type = FileType(data.get("type"))
+        if file_type == FileType.DIRECTORY:
+            return Directory.from_dict(data)
+        elif file_type == FileType.PDF:
+            return PdfFile.from_dict(data)
+        elif file_type == FileType.LINK:
+            return LinkFile.from_dict(data)
+        else:
+            return File.from_dict(data)
 
     def to_dict(self) -> dict:
         return {
@@ -42,6 +56,7 @@ class File:
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "tags": self.tags,
+            "processed": self.processed,
         }
 
     @classmethod
@@ -55,6 +70,7 @@ class File:
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
+            processed=data["processed"],
         )
 
 
@@ -79,6 +95,7 @@ class PdfFile(File):
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
+            processed=data["processed"],
         )
 
 
@@ -103,6 +120,7 @@ class LinkFile(File):
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
+            processed=data["processed"],
         )
 
 

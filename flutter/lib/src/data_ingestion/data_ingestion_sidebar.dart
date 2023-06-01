@@ -49,6 +49,23 @@ class DataIngestionSideBar extends HookWidget {
       return Icon(iconData);
     }
 
+    Widget? getProcessingStatusIcon(bool processed) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: processed
+            ? const Icon(
+                Icons.check,
+                color: Colors.green,
+                size: 20,
+              )
+            : const SizedBox(
+                width: 15,
+                height: 15,
+                child: CircularProgressIndicator(strokeWidth: 2.0),
+              ),
+      );
+    }
+
     return ListView(
       shrinkWrap: true,
       physics: const AlwaysScrollableScrollPhysics(),
@@ -64,9 +81,12 @@ class DataIngestionSideBar extends HookWidget {
                     iconColor: Theme.of(context).iconTheme.color,
                     title: ListTile(
                       contentPadding: EdgeInsets.only(left: padding),
-                      leading: getIconForFileSystemItem(entry.value.item,
-                          isOutlined:
-                              !isItemSelected(selectedItem, entry.value)),
+                      leading: getIconForFileSystemItem(
+                        entry.value.item,
+                        isOutlined: !isItemSelected(selectedItem, entry.value),
+                      ),
+                      trailing:
+                          getProcessingStatusIcon(entry.value.item.processed),
                       title: Text(entry.value.item.name == ''
                           ? root.item.name
                           : entry.value.item.name),
@@ -86,6 +106,8 @@ class DataIngestionSideBar extends HookWidget {
                     contentPadding: EdgeInsets.only(left: padding + 16),
                     leading: getIconForFileSystemItem(entry.value.item,
                         isOutlined: !isItemSelected(selectedItem, entry.value)),
+                    trailing:
+                        getProcessingStatusIcon(entry.value.item.processed),
                     title: Text(entry.value.item.name),
                     selected: isItemSelected(selectedItem, entry.value),
                     onTap: () {

@@ -14,24 +14,67 @@ class LinkUploader extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController linkController = useTextEditingController();
+    final ValueNotifier<bool> isLinkValid = useState(true);
+
+    bool isValidLink(String link) {
+      if (link.isEmpty) {
+        return false;
+      }
+
+      // Check if the link is valid
+      Uri? uri;
+      try {
+        uri = Uri.parse(link);
+      } catch (e) {
+        return false;
+      }
+
+      // Check if the URL has a scheme (like https) and a host (like google.com)
+      if (!(uri.isAbsolute && uri.hasScheme && uri.hasAuthority)) {
+        return false;
+      }
+
+      return true;
+    }
 
     Future<void> uploadLink() async {
       String link = linkController.text;
 
       if (link.isEmpty) {
         print('No link to upload');
-      } else {
-        final newItem = FileSystemItem.createFromAnotherFileSystemItem(item,
-            name: "New link",
-            type: FileSystemItemType.link,
-            url: linkController.text,
-            tags: [
-              "link",
-            ]);
-
-        print(newItem.toJson());
-        ServerApiMethods.createFileSystemItem(newItem);
+        return;
       }
+
+      // Check if the link is valid
+      Uri? uri;
+      try {
+        uri = Uri.parse(link);
+      } catch (e) {
+        print('Invalid link: $e');
+        isLinkValid.value = false;
+        return;
+      }
+
+      // Check if the URL has a scheme (like https) and a host (like google.com)
+      if (!(uri.isAbsolute && uri.hasScheme && uri.hasAuthority)) {
+        print('Invalid link: Missing scheme or host');
+        isLinkValid.value = false;
+        return;
+      }
+
+      // Reset the validation status
+      isLinkValid.value = true;
+
+      final newItem = FileSystemItem.createFromAnotherFileSystemItem(item,
+          name: "New link",
+          type: FileSystemItemType.link,
+          url: linkController.text,
+          tags: [
+            "link",
+          ]);
+
+      print(newItem.toJson());
+      ServerApiMethods.createFileSystemItem(newItem);
     }
 
     return Column(
@@ -44,10 +87,15 @@ class LinkUploader extends HookWidget {
         const SizedBox(
           height: 10,
         ),
-        TextField(
-          controller: linkController,
-          decoration: const InputDecoration(
-            labelText: 'Enter a link',
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: linkController,
+            onChanged: (value) => isLinkValid.value = isValidLink(value),
+            decoration: InputDecoration(
+              labelText: 'Enter the link',
+              errorText: isLinkValid.value ? null : 'Invalid link',
+            ),
           ),
         ),
         const SizedBox(height: 20),

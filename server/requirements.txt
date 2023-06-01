@@ -1,8 +1,9 @@
 flask
 langchain
-llama-index==0.6.9
+llama-index==0.6.16.post1
 weaviate-client
 pymongo
 flask_cors
 flask_socketio
 eventlet
+html2text

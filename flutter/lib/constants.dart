@@ -8,5 +8,5 @@ class ServerConstants {
   static const String updateFileSystemItemEndpoint = '/update_file';
   static const String getFileSystemItemsEndpoint = '/get_files';
   static const String deleteFileSystemItemEndpoint = '/delete_file';
-  static const String ingestFileEndpoint = '/ingest_file';
+  static const String uploadFileEndpoint = '/upload_file';
 }

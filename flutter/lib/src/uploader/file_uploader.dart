@@ -20,7 +20,6 @@ class FileUploader extends HookWidget {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: [
-          'txt',
           'pdf',
         ], // Add the extensions you want to allow
       );
@@ -57,6 +56,11 @@ class FileUploader extends HookWidget {
           onPressed: () {
             if (uploadedFile.value != null) {
               ServerApiMethods.uploadFile(uploadedFile.value!).then((fileId) {
+                if (fileId == null) {
+                  print("File uploaded failed");
+                  return;
+                }
+
                 print("File uploaded with id $fileId");
 
                 final newItem = FileSystemItem.createFromAnotherFileSystemItem(
