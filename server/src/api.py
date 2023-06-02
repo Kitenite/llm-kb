@@ -2,6 +2,7 @@ import eventlet
 
 eventlet.monkey_patch()
 
+from storage.storage_context import StorageContextSingleton
 import sys
 from flask import Flask, request, jsonify
 from datasource.ingest import DataSourceHandler
@@ -10,6 +11,8 @@ from datasource.file_system import File
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
+from llama_index.indices.composability import ComposableGraph
+from llama_index import GPTListIndex
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
@@ -26,24 +29,33 @@ def create_app():
     )
     socketio.init_app(app)
 
-    @app.route("/query", methods=["POST"])
+    @app.route("/post_query", methods=["POST"])
     def post_query():
         """
         Request body should be a JSON object with the following format:
         {
-            "query": "What is a summary of this document?"
+            "query": "What is a summary of this document?",
+            "ids": ["id0", "id1"]
         }
         """
-        query_text = request.get_json(force=True)
-        if query_text is None:
+        data = request.get_json(force=True)
+        index_store = StorageContextSingleton.get_instance().index_store
+        # Get the indices from storage_context the query it
+        indices = []
+        for id in data["index_ids"]:
+            indices.append(index_store.get_index_struct(id))
+
+        graph = ComposableGraph.from_indices(GPTListIndex, indices)
+        query_engine = graph.as_query_engine()
+        response = query_engine.query(data["query"])
+        if data is None:
             return "No query text provided", 400
-        return "Baby don't hurt me"
+        return response
 
     @app.route("/get_files", methods=["GET"])
     def get_files():
         print("Retrieving all files", file=sys.stderr)
-        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
-        all_documents = file_system_collection.find()
+        all_documents = MongoDbClientSingleton.get_all_file_system_items()
         output = []
         for document in all_documents:
             # MongoDB includes _id field which is not serializable, so we need to remove it

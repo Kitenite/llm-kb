@@ -29,3 +29,17 @@ class StorageContextSingleton:
                 index_store=index_store,
             )
         return cls._instance
+
+    @classmethod
+    def get_index(self, index_id: str):
+        index_store = self.get_instance().index_store
+        return index_store.get_index_struct(index_id)
+
+    @classmethod
+    def get_indices(self, index_ids: list):
+        indices = []
+        for id in index_ids:
+            index_struct = self.get_index(id)
+            if index_struct:
+                indices.append(index_struct)
+        return indices

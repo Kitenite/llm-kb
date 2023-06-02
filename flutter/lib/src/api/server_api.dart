@@ -7,6 +7,23 @@ import 'package:file_picker/file_picker.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class ServerApiMethods {
+  static Future<String> postQuery(String query, List<String> ids) async {
+    final uri = Uri.http(
+        ServerConstants.devServerUrl, ServerConstants.postQueryEndpoint);
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    final body = jsonEncode({
+      'query': query,
+      'ids': ids,
+    });
+    final response = await http.post(uri, headers: headers, body: body);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to query');
+    }
+    return response.body;
+  }
+
   static Future<void> createFileSystemItem(FileSystemItem item) async {
     final uri = Uri.http(ServerConstants.devServerUrl,
         ServerConstants.createFileSystemItemEndpoint);

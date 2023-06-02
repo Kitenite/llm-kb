@@ -30,9 +30,7 @@ def build_mongodb_uri():
     password = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
     host = "mongodb"
     port = os.getenv("CONTAINER_MONGO_PORT")
-    # Build the MongoDB URI
     uri = f"mongodb://{username}:{password}@{host}:{port}"
-
     return uri
 
 
@@ -40,39 +38,58 @@ class MongoDbClientSingleton:
     _instance = None
 
     @classmethod
-    def get_instance(cls):
-        if not cls._instance:
-            cls._instance = MongoClient(build_mongodb_uri())
-        return cls._instance
+    def get_instance(self):
+        if not self._instance:
+            self._instance = MongoClient(build_mongodb_uri())
+        return self._instance
 
+    @classmethod
     def get_database(self, database: MongoDatabases):
         return self.get_instance()[database.value]
 
     @classmethod
-    def get_file_system_collection(cls):
-        return cls.get_instance()[MongoDatabases.CORPUS.value][
+    def get_file_system_collection(self):
+        return self.get_instance()[MongoDatabases.CORPUS.value][
             MongoCollections.FILE_SYSTEM.value
         ]
 
     @classmethod
-    def get_gridfs_instance(cls, database: MongoDatabases):
-        return GridFS(cls.get_instance()[database.value])
+    def get_all_file_system_items(self):
+        return self.get_file_system_collection().find()
 
     @classmethod
-    def get_document_fs(cls):
-        return cls.get_gridfs_instance(MongoDatabases.DOCUMENTS)
+    def get_file_system_items(self, ids: list):
+        object_ids = [ObjectId(id) for id in ids]
+        collection = self.get_file_system_collection()
+        return collection.find({"_id": {"$in": object_ids}})
 
     @classmethod
-    def get_document(cls, file_id: str):
-        fs = cls.get_document_fs()
+    def get_file_system_item(self, id: str):
+        object_id = ObjectId(id)
+        collection = self.get_file_system_collection()
+        return collection.find_one({"_id": object_id})
+
+    @classmethod
+    def get_gridfs_instance(self, database: MongoDatabases):
+        return GridFS(self.get_instance()[database.value])
+
+    @classmethod
+    def get_document_fs(self):
+        return self.get_gridfs_instance(MongoDatabases.DOCUMENTS)
+
+    @classmethod
+    def get_document(self, file_id: str):
+        fs = self.get_document_fs()
         return fs.get(ObjectId(file_id))
 
     @classmethod
-    def update_item(cls, item: File):
-        file_system_collection = cls.get_file_system_collection()
+    def update_item(self, item: File):
+        file_system_collection = self.get_file_system_collection()
         item_dict = item.to_dict()
-        # Required MongoDB '_id' field processing
-        item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
+
+        # Use item's 'id' as MongoDB '_id'
+        item_dict["_id"] = item_dict.pop("id")
+
         return file_system_collection.replace_one(
             {"_id": item_dict["_id"]}, item_dict, upsert=True
         )
