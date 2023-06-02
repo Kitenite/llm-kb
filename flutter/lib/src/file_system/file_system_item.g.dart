@@ -16,9 +16,10 @@ FileSystemItem _$FileSystemItemFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
+      processed: json['processed'] as bool? ?? false,
       url: json['url'] as String?,
       fsId: json['fs_id'] as String?,
-      processed: json['processed'] as bool? ?? false,
+      indexId: json['index_id'] as String?,
     );
 
 Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
@@ -31,9 +32,10 @@ Map<String, dynamic> _$FileSystemItemToJson(FileSystemItem instance) =>
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt.toIso8601String(),
       'tags': instance.tags,
+      'processed': instance.processed,
       'url': instance.url,
       'fs_id': instance.fsId,
-      'processed': instance.processed,
+      'index_id': instance.indexId,
     };
 
 const _$FileSystemItemTypeEnumMap = {

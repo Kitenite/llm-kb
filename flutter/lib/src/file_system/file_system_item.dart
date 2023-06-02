@@ -19,9 +19,10 @@ class FileSystemItem {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<String> tags;
+  final bool processed;
   final String? url;
   final String? fsId; // the id of the document in the file system
-  final bool processed; // new field
+  final String? indexId;
 
   FileSystemItem({
     required this.id,
@@ -32,9 +33,10 @@ class FileSystemItem {
     required this.createdAt,
     required this.updatedAt,
     required this.tags,
+    this.processed = false,
     this.url,
     this.fsId,
-    this.processed = false,
+    this.indexId,
   });
 
   bool get isDirectory => type == FileSystemItemType.directory;
@@ -48,6 +50,7 @@ class FileSystemItem {
     required List<String> tags,
     String? url,
     String? fsId,
+    String? indexId,
   }) {
     String id = const Uuid().v4();
     String parentId =
@@ -65,9 +68,10 @@ class FileSystemItem {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       tags: tags,
+      processed: false,
       url: url,
-      fsId: fsId, // added fsId parameter
-      processed: false, // initialize the new field
+      fsId: fsId,
+      indexId: indexId,
     );
   }
 

@@ -84,8 +84,9 @@ def create_app():
             index = DataSourceHandler.process_file(item)
 
             # Update the item with the index
-            print(index, file=sys.stderr)
+
             item.processed = True
+            item.index_id = index.index_id
             MongoDbClientSingleton.update_item(item)
             socketio.emit("file_system_update")
 

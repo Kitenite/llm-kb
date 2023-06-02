@@ -23,6 +23,7 @@ class File:
         updated_at: datetime,
         tags: List[str],
         processed: bool,
+        index_id: Optional[str] = None,
     ):
         self.id = id
         self.name = name
@@ -33,6 +34,7 @@ class File:
         self.updated_at = updated_at
         self.tags = tags
         self.processed = processed
+        self.index_id = index_id
 
     @staticmethod
     def from_dict_factory(data: dict):
@@ -57,6 +59,7 @@ class File:
             "updated_at": self.updated_at.isoformat(),
             "tags": self.tags,
             "processed": self.processed,
+            "index_id": self.index_id,
         }
 
     @classmethod
@@ -71,6 +74,7 @@ class File:
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
             processed=data["processed"],
+            index_id=data.get("index_id"),
         )
 
 
@@ -96,6 +100,7 @@ class PdfFile(File):
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
             processed=data["processed"],
+            index_id=data.get("index_id"),
         )
 
 
@@ -121,6 +126,7 @@ class LinkFile(File):
             updated_at=datetime.fromisoformat(data["updated_at"]),
             tags=data["tags"],
             processed=data["processed"],
+            index_id=data.get("index_id"),
         )
 
 
