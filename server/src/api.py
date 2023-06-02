@@ -1,3 +1,7 @@
+import eventlet
+
+eventlet.monkey_patch()
+
 import sys
 from flask import Flask, request, jsonify
 from datasource.ingest import DataSourceHandler
@@ -6,11 +10,12 @@ from datasource.file_system import File
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
-import threading
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
 def create_app():
+    # Enable multiple threads
+
     # create and configure the app
     app = Flask(__name__)
 
@@ -21,18 +26,18 @@ def create_app():
     )
     socketio.init_app(app)
 
-    # @app.route("/query", methods=["POST"])
-    # def query_index():
-    #     """
-    #     Request body should be a JSON object with the following format:
-    #     {
-    #         "query": "What is a summary of this document?"
-    #     }
-    #     """
-    #     query_text = request.get_json(force=True)
-    #     if query_text is None:
-    #         return "No query text provided", 400
-    #     return "Baby don't hurt me"
+    @app.route("/query", methods=["POST"])
+    def post_query():
+        """
+        Request body should be a JSON object with the following format:
+        {
+            "query": "What is a summary of this document?"
+        }
+        """
+        query_text = request.get_json(force=True)
+        if query_text is None:
+            return "No query text provided", 400
+        return "Baby don't hurt me"
 
     @app.route("/get_files", methods=["GET"])
     def get_files():
@@ -73,34 +78,25 @@ def create_app():
         # Convert the data to a File object
         item = File.from_dict_factory(data)
 
-        # Use DataSourceHandler to process the file
+        print("Inserting file system item", file=sys.stderr)
+
         def process_item(item):
-            # Use DataSourceHandler to process the file
-            DataSourceHandler.process_file(item)
+            index = DataSourceHandler.process_file(item)
 
-            # After processing, save item in mongodb with processed=True
+            # Update the item with the index
+            print(index, file=sys.stderr)
+            item.processed = True
+            MongoDbClientSingleton.update_item(item)
+            socketio.emit("file_system_update")
 
-            # Emit the event back on the main thread when processing is finished
-            with app.app_context():
-                socketio.emit("file_system_update", {})
+        socketio.start_background_task(process_item, item)
 
-        # Call the process_item function in a new thread
-        threading.Thread(target=process_item, args=(item,)).start()
-
-        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
-        item_dict = item.to_dict()
-
-        # Required MongoDB '_id' field processing
-        item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
-        result = file_system_collection.insert_one(item_dict)
-        print(
-            f"Processed and inserted file system item with id: [{result.inserted_id}]",
-            file=sys.stderr,
-        )
-        socketio.emit("file_system_update", item_dict)
+        # Insert item
+        MongoDbClientSingleton.update_item(item)
+        socketio.emit("file_system_update")
 
         return (
-            f"Processed and inserted file system item with id: [{result.inserted_id}]",
+            f"Processed and inserted file system item",
             200,
         )
 
@@ -111,30 +107,19 @@ def create_app():
         # Convert the data to a File object
         item = File.from_dict_factory(data)
 
-        # Get file from MongoDB
-        file_system_collection = MongoDbClientSingleton.get_file_system_collection()
-        item_dict = item.to_dict()
-
-        # Required MongoDB '_id' field processing
-        item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
-        result = file_system_collection.replace_one(
-            {"_id": item_dict["_id"]}, item_dict, upsert=True
-        )
+        # Update the file in MongoDB
+        result = MongoDbClientSingleton.update_item(item)
 
         if result.upserted_id is not None:
             print(
                 f"Inserted file system item with id: [{result.upserted_id}]",
                 file=sys.stderr,
             )
-            socketio.emit("file_system_update", item_dict)
+            socketio.emit("file_system_update")
             return f"Inserted file system item with id: [{result.upserted_id}]", 200
         elif result.modified_count > 0:
-            print(
-                f"Updated file system item with id: [{item_dict['_id']}]",
-                file=sys.stderr,
-            )
-            socketio.emit("file_system_update", item_dict)
-            return f"Updated file system item with id: [{item_dict['_id']}]", 200
+            socketio.emit("file_system_update")
+            return f"Updated file system item with id: [{result.upserted_id}]", 200
         else:
             return "An error occurred during the update.", 500
 
@@ -145,7 +130,7 @@ def create_app():
         result = file_system_collection.delete_one({"_id": id})
         if result.deleted_count == 1:
             print(f"Deleted file system item with id: {id}", file=sys.stderr)
-            socketio.emit("file_system_update", {"_id": id, "operation": "delete"})
+            socketio.emit("file_system_update")
             return f"Deleted file system item with id: {id}", 200
         else:
             return "No file item found with this id.", 404
@@ -163,4 +148,4 @@ def create_app():
 
 if __name__ == "__main__":
     app, socketio = create_app()
-    socketio.run(app, host="0.0.0.0")
+    socketio.run(app, host="0.0.0.0", debug=True)

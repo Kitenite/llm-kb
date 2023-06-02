@@ -4,6 +4,8 @@ from gridfs import GridFS
 import os
 from bson.objectid import ObjectId
 
+from datasource.file_system import File
+
 
 class MongoDatabases(Enum):
     """
@@ -64,3 +66,13 @@ class MongoDbClientSingleton:
     def get_document(cls, file_id: str):
         fs = cls.get_document_fs()
         return fs.get(ObjectId(file_id))
+
+    @classmethod
+    def update_item(cls, item: File):
+        file_system_collection = cls.get_file_system_collection()
+        item_dict = item.to_dict()
+        # Required MongoDB '_id' field processing
+        item_dict["_id"] = item_dict.pop("id")  # use item's 'id' as MongoDB '_id'
+        return file_system_collection.replace_one(
+            {"_id": item_dict["_id"]}, item_dict, upsert=True
+        )

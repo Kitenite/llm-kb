@@ -18,9 +18,8 @@ class DataSourceHandler:
         index = GPTVectorStoreIndex.from_documents(
             documents, storage_context=StorageContextSingleton.get_instance()
         )
-        query_engine = index.as_query_engine()
-        response = query_engine.query("What is this document about?")
-        print(response, file=sys.stderr)
+        print("Finished processing", file=sys.stderr)
+        return index
 
     @staticmethod
     def process_directory(directory: Directory):
@@ -37,10 +36,10 @@ class DataSourceHandler:
     @staticmethod
     def process_file(file: File):
         if file.type == FileType.PDF:
-            DataSourceHandler.process_pdf(file)
+            return DataSourceHandler.process_pdf(file)
         elif file.type == FileType.LINK:
-            DataSourceHandler.process_link(file)
+            return DataSourceHandler.process_link(file)
         elif file.type == FileType.DIRECTORY:
-            DataSourceHandler.process_directory(file)
+            return DataSourceHandler.process_directory(file)
         else:  # For FileType.GENERIC and any other cases
-            DataSourceHandler.process_generic(file)
+            return DataSourceHandler.process_generic(file)
