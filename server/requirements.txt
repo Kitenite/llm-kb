@@ -1,6 +1,6 @@
 flask
 langchain
-llama-index==0.6.16.post1
+llama-index==0.6.18
 weaviate-client
 pymongo
 flask_cors

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class ResizableSideBar extends HookWidget {
   final List<Widget> sideBarChildren;
@@ -53,32 +52,5 @@ class ResizableSideBar extends HookWidget {
         ...mainViewChildren
       ],
     );
-  }
-}
-
-// Create place holder for QuerySideBar
-class QuerySideBar extends StatelessWidget {
-  final double width;
-  final List<FileSystemItem> items;
-
-  const QuerySideBar({
-    Key? key,
-    required this.width,
-    required this.items,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Placeholder();
-  }
-}
-
-// Create place holder for QueryChatView
-class QueryChatView extends StatelessWidget {
-  const QueryChatView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Placeholder();
   }
 }

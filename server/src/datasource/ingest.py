@@ -18,7 +18,8 @@ class DataSourceHandler:
         index = GPTVectorStoreIndex.from_documents(
             documents, storage_context=StorageContextSingleton.get_instance()
         )
-        print("Finished processing", file=sys.stderr)
+        StorageContextSingleton.get_instance().persist()
+        print("Created index", file=sys.stderr)
         return index
 
     @staticmethod

@@ -23,55 +23,61 @@ class DataIngestionEditView extends HookWidget {
     }, [item]);
 
     return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          TextField(
-            controller: jsonController,
-            maxLines: null,
-            decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: isValidJson.value ? Colors.blue : Colors.red),
-              ),
-              border: const OutlineInputBorder(),
-              labelText: 'JSON Input',
-              errorText: isValidJson.value ? null : 'Invalid json',
-            ),
-            onChanged: (value) => isValidJson.value = validateJson(value),
-          ),
-          const SizedBox(height: 20),
-          Row(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  if (!isValidJson.value) {
-                    return;
-                  }
-                  // Update the item with the new JSON
-                  var jsonData = jsonDecode(jsonController.text);
-                  final newItem = FileSystemItem.fromJson(jsonData);
-                  // Do something here
-                  ServerApiMethods.updateFileSystemItem(newItem);
-                },
-                child: const Text('Update item'),
-              ),
-              const SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {
-                  ServerApiMethods.deleteFileSystemItem(item.id);
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red, // This is the color of the text
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              TextField(
+                controller: jsonController,
+                maxLines: null,
+                decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: isValidJson.value ? Colors.blue : Colors.red),
+                  ),
+                  border: const OutlineInputBorder(),
+                  labelText: 'JSON Input',
+                  errorText: isValidJson.value ? null : 'Invalid json',
                 ),
-                child: const Text('Delete item'),
+                onChanged: (value) => isValidJson.value = validateJson(value),
               ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (!isValidJson.value) {
+                        return;
+                      }
+                      // Update the item with the new JSON
+                      var jsonData = jsonDecode(jsonController.text);
+                      final newItem = FileSystemItem.fromJson(jsonData);
+                      // Do something here
+                      ServerApiMethods.updateFileSystemItem(newItem);
+                    },
+                    child: const Text('Update item'),
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      ServerApiMethods.deleteFileSystemItem(item.id);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          Colors.red, // This is the color of the text
+                    ),
+                    child: const Text('Delete item'),
+                  ),
+                ],
+              )
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

@@ -1,10 +1,9 @@
 from enum import Enum
 from pymongo import MongoClient
 from gridfs import GridFS
-import os
 from bson.objectid import ObjectId
-
 from datasource.file_system import File
+import os
 
 
 class MongoDatabases(Enum):
@@ -59,15 +58,13 @@ class MongoDbClientSingleton:
 
     @classmethod
     def get_file_system_items(self, ids: list):
-        object_ids = [ObjectId(id) for id in ids]
         collection = self.get_file_system_collection()
-        return collection.find({"_id": {"$in": object_ids}})
+        return collection.find({"_id": {"$in": ids}})
 
     @classmethod
     def get_file_system_item(self, id: str):
-        object_id = ObjectId(id)
         collection = self.get_file_system_collection()
-        return collection.find_one({"_id": object_id})
+        return collection.find_one({"_id": id})
 
     @classmethod
     def get_gridfs_instance(self, database: MongoDatabases):

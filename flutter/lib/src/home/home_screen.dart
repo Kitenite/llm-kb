@@ -12,7 +12,6 @@ class HomePage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final currentIndex = useState(0);
-
     final fsItemsMap = useState<Map<String, FileSystemItem>>({});
 
     void getFileSystemItems() {

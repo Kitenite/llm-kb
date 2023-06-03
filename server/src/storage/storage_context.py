@@ -2,6 +2,9 @@ from llama_index import StorageContext
 from llama_index.storage.index_store import MongoIndexStore
 from llama_index.storage.docstore import MongoDocumentStore
 from llama_index.vector_stores import WeaviateVectorStore
+from llama_index import (
+    load_indices_from_storage,
+)
 
 import weaviate
 from storage.mongo import build_mongodb_uri
@@ -32,14 +35,11 @@ class StorageContextSingleton:
 
     @classmethod
     def get_index(self, index_id: str):
+        print(index_id)
         index_store = self.get_instance().index_store
         return index_store.get_index_struct(index_id)
 
     @classmethod
     def get_indices(self, index_ids: list):
-        indices = []
-        for id in index_ids:
-            index_struct = self.get_index(id)
-            if index_struct:
-                indices.append(index_struct)
+        indices = load_indices_from_storage(self.get_instance(), index_ids=index_ids)
         return indices

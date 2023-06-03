@@ -24,6 +24,7 @@ class FileSystemItem {
   final String? url;
   final String? fsId; // the id of the document in the file system
   final String? indexId;
+  final String? summary;
 
   FileSystemItem({
     required this.id,
@@ -38,6 +39,7 @@ class FileSystemItem {
     this.url,
     this.fsId,
     this.indexId,
+    this.summary,
   });
 
   bool get isDirectory => type == FileSystemItemType.directory;
@@ -53,6 +55,7 @@ class FileSystemItem {
     String? url,
     String? fsId,
     String? indexId,
+    String? summary,
   }) {
     String id = const Uuid().v4();
     String parentId =
@@ -74,6 +77,7 @@ class FileSystemItem {
       url: url,
       fsId: fsId,
       indexId: indexId,
+      summary: summary,
     );
   }
 

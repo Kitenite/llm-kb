@@ -7,12 +7,12 @@ import sys
 from flask import Flask, request, jsonify
 from datasource.ingest import DataSourceHandler
 from storage.mongo import MongoDbClientSingleton
-from datasource.file_system import File
+from datasource.file_system import File, FileType
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from llama_index.indices.composability import ComposableGraph
-from llama_index import GPTListIndex
+from llama_index import GPTListIndex, GPTVectorStoreIndex
 
 
 # More setup information here: https://flask.palletsprojects.com/en/2.2.x/tutorial/factory/
@@ -39,17 +39,33 @@ def create_app():
         }
         """
         data = request.get_json(force=True)
-        index_store = StorageContextSingleton.get_instance().index_store
-        # Get the indices from storage_context the query it
-        indices = []
-        for id in data["index_ids"]:
-            indices.append(index_store.get_index_struct(id))
+        if data is None or "query" not in data or "ids" not in data:
+            return "Invalid request", 400
+        if len(data["ids"]) == 0:
+            return "No data selected", 200
 
-        graph = ComposableGraph.from_indices(GPTListIndex, indices)
+        # Get the indices from storage_context the query it
+        print(data, file=sys.stderr)
+        index_ids = []
+        summaries = []
+        for id in data["ids"]:
+            print(id, file=sys.stderr)
+            item_dict = MongoDbClientSingleton.get_file_system_item(id)
+            index_ids.append(item_dict["index_id"])
+            summaries.append(item_dict["summary"])
+
+        indices = StorageContextSingleton.get_indices(index_ids)
+
+        graph = ComposableGraph.from_indices(
+            root_index_cls=GPTListIndex,
+            children_indices=indices,
+            index_summaries=summaries,
+            index_ids=index_ids,
+            storage_context=StorageContextSingleton.get_instance(),
+        )
         query_engine = graph.as_query_engine()
-        response = query_engine.query(data["query"])
-        if data is None:
-            return "No query text provided", 400
+        response = str(query_engine.query(data["query"]))
+        print(response, file=sys.stderr)
         return response
 
     @app.route("/get_files", methods=["GET"])
@@ -93,15 +109,29 @@ def create_app():
         print("Inserting file system item", file=sys.stderr)
 
         def process_item(item):
-            if item.type == "directory":
+            if item.type == FileType.DIRECTORY:
+                item.processed = True
+                MongoDbClientSingleton.update_item(item)
+                socketio.emit("file_system_update")
                 return
 
             index = DataSourceHandler.process_file(item)
+            query_engine = index.as_query_engine()
+
+            print("Generating summary", file=sys.stderr)
+            summary = str(query_engine.query("What is a summary of this document?"))
+            print(f"Summary: {summary}", file=sys.stderr)
+
+            print("Generating title", file=sys.stderr)
+            title = str(query_engine.query("Give this document a short title."))
+            print(f"Title: {title}", file=sys.stderr)
 
             # Update the item with the index
-
             item.processed = True
             item.index_id = index.index_id
+            item.summary = summary
+            item.name = title
+
             MongoDbClientSingleton.update_item(item)
             socketio.emit("file_system_update")
 

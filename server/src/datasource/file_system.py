@@ -23,6 +23,7 @@ class File:
         updated_at: datetime,
         tags: List[str],
         processed: bool,
+        summary: Optional[str] = None,
         index_id: Optional[str] = None,
     ):
         self.id = id
@@ -34,6 +35,7 @@ class File:
         self.updated_at = updated_at
         self.tags = tags
         self.processed = processed
+        self.summary = summary
         self.index_id = index_id
 
     @staticmethod
@@ -60,6 +62,7 @@ class File:
             "tags": self.tags,
             "processed": self.processed,
             "index_id": self.index_id,
+            "summary": self.summary,
         }
 
     @classmethod
@@ -75,13 +78,14 @@ class File:
             tags=data["tags"],
             processed=data["processed"],
             index_id=data.get("index_id"),
+            summary=data.get("summary"),
         )
 
 
 class PdfFile(File):
     def __init__(self, fs_id: Optional[str] = None, **kwargs):
         super().__init__(type=FileType.PDF, **kwargs)
-        self.fs_id = fs_id  # the id of the document in the file system
+        self.fs_id = fs_id
 
     def to_dict(self) -> dict:
         result = super().to_dict()
@@ -101,6 +105,7 @@ class PdfFile(File):
             tags=data["tags"],
             processed=data["processed"],
             index_id=data.get("index_id"),
+            summary=data.get("summary"),
         )
 
 
@@ -127,6 +132,7 @@ class LinkFile(File):
             tags=data["tags"],
             processed=data["processed"],
             index_id=data.get("index_id"),
+            summary=data.get("summary"),
         )
 
 
