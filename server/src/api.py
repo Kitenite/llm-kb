@@ -93,6 +93,9 @@ def create_app():
         print("Inserting file system item", file=sys.stderr)
 
         def process_item(item):
+            if item.type == "directory":
+                return
+
             index = DataSourceHandler.process_file(item)
 
             # Update the item with the index

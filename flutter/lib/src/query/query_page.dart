@@ -1,39 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:kb_ui/src/data_ingestion/data_ingestion_page.dart';
+import 'package:kb_ui/src/common/resizable_side_bar.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 import 'package:kb_ui/src/file_system/file_tree_item.dart';
 
-class DataIngestionSideBar extends HookWidget {
-  final List<FileSystemItem> items;
-  final ValueNotifier<String> selectedItem;
-  final ValueNotifier<DataIngestionMode> mode;
+class QueryPage extends HookWidget {
+  final ValueNotifier<Map<String, FileSystemItem>> fsItemsMap;
+  final Function getFileSystemItems;
 
-  const DataIngestionSideBar({
+  const QueryPage({
+    Key? key,
+    required this.fsItemsMap,
+    required this.getFileSystemItems,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedItems = useState<List<FileSystemItem>>([]);
+
+    final List<Widget> sideBarChildren = [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                getFileSystemItems();
+              },
+            ),
+          ],
+        ),
+      ),
+      ValueListenableBuilder(
+        valueListenable: fsItemsMap,
+        builder: (context, map, child) {
+          return QuerySideBar(
+            items: map.values.toList(),
+            selectedItems: selectedItems,
+          );
+        },
+      ),
+    ];
+    final List<Widget> mainViewChildren = [const QueryChatView()];
+
+    return Scaffold(
+      body: ResizableSideBar(
+        sideBarChildren: sideBarChildren,
+        mainViewChildren: mainViewChildren,
+      ),
+    );
+  }
+}
+
+class QuerySideBar extends HookWidget {
+  final List<FileSystemItem> items;
+  final ValueNotifier<List<FileSystemItem>> selectedItems;
+
+  const QuerySideBar({
     Key? key,
     required this.items,
-    required this.selectedItem,
-    required this.mode,
+    required this.selectedItems,
   }) : super(key: key);
+
+  void toggleSelectItemAndChildren(FileTreeNode node) {
+    List<FileSystemItem> allItems = FileTreeNode.getAllChildrenItems(node);
+
+    if (selectedItems.value.contains(node.item)) {
+      selectedItems.value = selectedItems.value.where((element) {
+        return !allItems.contains(element);
+      }).toList();
+      return;
+    }
+    selectedItems.value = [...selectedItems.value, ...allItems];
+  }
 
   // Recursive function to build the directory structure
   Widget buildDirectory(BuildContext context, FileTreeNode root,
       [double padding = 16.0]) {
-    bool isItemSelected(entry) {
-      return selectedItem.value == entry.item.id;
-    }
-
-    Widget? getProcessingStatusIcon(bool processed) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: processed
-            ? null
-            : const SizedBox(
-                width: 15,
-                height: 15,
-                child: CircularProgressIndicator(strokeWidth: 2.0),
-              ),
-      );
+    bool isItemSelected(FileTreeNode node) {
+      return selectedItems.value.contains(node.item);
     }
 
     return ListView(
@@ -55,14 +101,10 @@ class DataIngestionSideBar extends HookWidget {
                         entry.value.item,
                         isOutlined: !isItemSelected(entry.value),
                       ),
-                      trailing:
-                          getProcessingStatusIcon(entry.value.item.processed),
                       title: Text(entry.value.item.name),
                       selected: isItemSelected(entry.value),
                       onTap: () {
-                        selectedItem.value = entry.value.item.id;
-                        mode.value = DataIngestionMode.view;
-                        // Handle folder navigation or action
+                        toggleSelectItemAndChildren(entry.value);
                       },
                     ),
                     children: [
@@ -74,14 +116,10 @@ class DataIngestionSideBar extends HookWidget {
                     leading: FileSystemItem.getIconForFileSystemItem(
                         entry.value.item,
                         isOutlined: !isItemSelected(entry.value)),
-                    trailing:
-                        getProcessingStatusIcon(entry.value.item.processed),
                     title: Text(entry.value.item.name),
                     selected: isItemSelected(entry.value),
                     onTap: () {
-                      selectedItem.value = entry.value.item.id;
-                      mode.value = DataIngestionMode.view;
-                      // Handle file action
+                      toggleSelectItemAndChildren(entry.value);
                     },
                   ),
           ],
@@ -114,5 +152,15 @@ class DataIngestionSideBar extends HookWidget {
         ],
       ),
     );
+  }
+}
+
+// Create place holder for QueryChatView
+class QueryChatView extends StatelessWidget {
+  const QueryChatView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

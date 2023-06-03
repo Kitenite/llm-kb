@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -42,6 +43,7 @@ class FileSystemItem {
   bool get isDirectory => type == FileSystemItemType.directory;
   bool get isPdf => type == FileSystemItemType.pdf;
   bool get isLink => type == FileSystemItemType.link;
+  bool get isRoot => (type == FileSystemItemType.directory && id == '-1');
 
   static FileSystemItem createFromAnotherFileSystemItem(
     FileSystemItem anotherItem, {
@@ -75,6 +77,21 @@ class FileSystemItem {
     );
   }
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FileSystemItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
+
+  factory FileSystemItem.fromJson(Map<String, dynamic> json) =>
+      _$FileSystemItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FileSystemItemToJson(this);
+
   static FileSystemItem getRootItem() {
     return FileSystemItem(
       id: '-1',
@@ -89,8 +106,26 @@ class FileSystemItem {
     );
   }
 
-  factory FileSystemItem.fromJson(Map<String, dynamic> json) =>
-      _$FileSystemItemFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FileSystemItemToJson(this);
+  static Icon getIconForFileSystemItem(FileSystemItem item,
+      {bool isOutlined = false}) {
+    IconData iconData;
+    switch (item.type) {
+      case FileSystemItemType.directory:
+        iconData = isOutlined ? Icons.folder_outlined : Icons.folder;
+        break;
+      case FileSystemItemType.pdf:
+        iconData =
+            isOutlined ? Icons.picture_as_pdf_outlined : Icons.picture_as_pdf;
+        break;
+      case FileSystemItemType.link:
+        iconData = isOutlined ? Icons.link : Icons.link;
+        break;
+      default:
+        iconData = isOutlined
+            ? Icons.insert_drive_file_outlined
+            : Icons.insert_drive_file;
+        break;
+    }
+    return Icon(iconData);
+  }
 }
