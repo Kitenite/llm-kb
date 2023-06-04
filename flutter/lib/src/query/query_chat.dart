@@ -77,7 +77,11 @@ class QueryChatView extends HookWidget {
       ServerApiMethods.postQuery(controller.text, ids).then((value) {
         addToMessages(value, ChatType.response);
         loading.value = false;
+      }).catchError((error) {
+        addToMessages(error.toString(), ChatType.response);
+        loading.value = false;
       });
+
       controller.clear();
     }
 

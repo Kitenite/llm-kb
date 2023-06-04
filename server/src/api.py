@@ -1,4 +1,5 @@
 import eventlet
+from helpers.texts import clean_text
 
 eventlet.monkey_patch()
 
@@ -49,7 +50,6 @@ def create_app():
         index_ids = []
         summaries = []
         for id in data["ids"]:
-            print(id, file=sys.stderr)
             item_dict = MongoDbClientSingleton.get_file_system_item(id)
             index_ids.append(item_dict["index_id"])
             summaries.append(item_dict["summary"])
@@ -57,14 +57,13 @@ def create_app():
         indices = StorageContextSingleton.get_indices(index_ids)
 
         graph = ComposableGraph.from_indices(
-            root_index_cls=GPTListIndex,
+            root_index_cls=GPTVectorStoreIndex,
             children_indices=indices,
             index_summaries=summaries,
-            index_ids=index_ids,
-            storage_context=StorageContextSingleton.get_instance(),
+            storage_context=StorageContextSingleton.get_context(),
         )
         query_engine = graph.as_query_engine()
-        response = str(query_engine.query(data["query"]))
+        response = clean_text(str(query_engine.query(data["query"])))
         print(response, file=sys.stderr)
         return response
 
@@ -119,11 +118,19 @@ def create_app():
             query_engine = index.as_query_engine()
 
             print("Generating summary", file=sys.stderr)
-            summary = str(query_engine.query("What is a summary of this document?"))
+            summary = clean_text(
+                str(query_engine.query("What is a summary of this document?"))
+            )
             print(f"Summary: {summary}", file=sys.stderr)
 
             print("Generating title", file=sys.stderr)
-            title = str(query_engine.query("Give this document a short title."))
+            title = clean_text(
+                str(
+                    query_engine.query(
+                        f"Give this document a title based on its summary: {summary}"
+                    )
+                )
+            )
             print(f"Title: {title}", file=sys.stderr)
 
             # Update the item with the index

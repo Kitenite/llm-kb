@@ -2,14 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# ENV FLASK_APP=src/api.py
-# ENV FLASK_RUN_HOST=0.0.0.0
-# ENV FLASK_RUN_PORT=5000
-
 RUN apt-get update
 RUN apt-get install -y gcc build-essential
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Create the default llama index context storage path
+ARG CONTEXT_STORAGE_DIR=/app/storage
+ENV CONTEXT_STORAGE_DIR=$CONTEXT_STORAGE_DIR
+RUN mkdir $CONTEXT_STORAGE_DIR
 
 EXPOSE 5000
 COPY . .

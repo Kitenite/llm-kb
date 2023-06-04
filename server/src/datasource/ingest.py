@@ -15,10 +15,11 @@ class DataSourceHandler:
         print(f"Processing Link file with details: {link.to_dict()}", file=sys.stderr)
 
         documents = SimpleWebPageReader(html_to_text=True).load_data([link.url])
+        storage_context = StorageContextSingleton.get_context()
         index = GPTVectorStoreIndex.from_documents(
-            documents, storage_context=StorageContextSingleton.get_instance()
+            documents, storage_context=storage_context
         )
-        StorageContextSingleton.get_instance().persist()
+        storage_context.persist()
         print("Created index", file=sys.stderr)
         return index
 
