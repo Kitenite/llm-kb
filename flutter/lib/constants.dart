@@ -1,8 +1,6 @@
 class ServerConstants {
-  static const String devServerUrl =
-      'localhost:8001'; // Used to develop with local Flutter
-  static const String prodServerUrl =
-      'server:8001'; // Used for container Flutter
+  static const String serverUrl =
+      'localhost:8001'; // Replace with localhost:8001 for local development
   static const String subscribeToFileSystemEndpoint = '/file_system_update';
   static const String createFileSystemItemEndpoint = '/create_file';
   static const String updateFileSystemItemEndpoint = '/update_file';

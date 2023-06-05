@@ -8,7 +8,7 @@ class SocketService {
 
   // Private constructor
   SocketService._() {
-    _socket = IO.io('http://${ServerConstants.devServerUrl}', <String, dynamic>{
+    _socket = IO.io('http://${ServerConstants.serverUrl}', <String, dynamic>{
       'transports': ['websocket'],
     });
 

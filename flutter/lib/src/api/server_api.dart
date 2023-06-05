@@ -8,8 +8,8 @@ import 'package:kb_ui/src/file_system/file_system_item.dart';
 
 class ServerApiMethods {
   static Future<String> postQuery(String query, List<String> ids) async {
-    final uri = Uri.http(
-        ServerConstants.devServerUrl, ServerConstants.postQueryEndpoint);
+    final uri =
+        Uri.http(ServerConstants.serverUrl, ServerConstants.postQueryEndpoint);
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     };
@@ -25,7 +25,7 @@ class ServerApiMethods {
   }
 
   static Future<void> createFileSystemItem(FileSystemItem item) async {
-    final uri = Uri.http(ServerConstants.devServerUrl,
+    final uri = Uri.http(ServerConstants.serverUrl,
         ServerConstants.createFileSystemItemEndpoint);
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -38,7 +38,7 @@ class ServerApiMethods {
   }
 
   static Future<void> updateFileSystemItem(FileSystemItem item) async {
-    final uri = Uri.http(ServerConstants.devServerUrl,
+    final uri = Uri.http(ServerConstants.serverUrl,
         ServerConstants.updateFileSystemItemEndpoint);
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -51,7 +51,7 @@ class ServerApiMethods {
   }
 
   static Future<void> deleteFileSystemItem(String itemId) async {
-    final uri = Uri.http(ServerConstants.devServerUrl,
+    final uri = Uri.http(ServerConstants.serverUrl,
         '${ServerConstants.deleteFileSystemItemEndpoint}/$itemId');
     final response = await http.delete(uri);
     if (response.statusCode != 200) {
@@ -60,8 +60,8 @@ class ServerApiMethods {
   }
 
   static Future<List<FileSystemItem>> getFileSystemItems() async {
-    final uri = Uri.http(ServerConstants.devServerUrl,
-        ServerConstants.getFileSystemItemsEndpoint);
+    final uri = Uri.http(
+        ServerConstants.serverUrl, ServerConstants.getFileSystemItemsEndpoint);
 
     final response = await http.get(uri);
 
@@ -74,8 +74,8 @@ class ServerApiMethods {
   }
 
   static Future<String?> uploadFile(PlatformFile uploadedFile) async {
-    var postUri = Uri.http(
-        ServerConstants.devServerUrl, ServerConstants.uploadFileEndpoint);
+    var postUri =
+        Uri.http(ServerConstants.serverUrl, ServerConstants.uploadFileEndpoint);
 
     var request = http.MultipartRequest(
       "POST",

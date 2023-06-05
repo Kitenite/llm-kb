@@ -22,6 +22,7 @@ services:
       - ./mongo-keyfile:/etc/mongo-keyfile
       - ./.env:/.env
 
+  # Disabled for now: Storing data locally in server with a volume instead
   # weaviate:
   #   image: semitechnologies/weaviate:1.19.5
   #   command:
@@ -58,6 +59,7 @@ services:
       
       # Server config
       FLASK_DEBUG: "true" # Hot reload server code changes
+      CONTAINER_SERVER_PORT: ${CONTAINER_SERVER_PORT}
       
       # Weaviate
       HOST_WEAVIATE_PORT: ${HOST_WEAVIATE_PORT}
@@ -76,14 +78,16 @@ services:
       - file_data:${FILE_STORAGE_DIR}
       - context_data:${CONTEXT_STORAGE_DIR}
       
-  # client:
-  #   build: ./flutter
-  #   depends_on:
-  #     - server
-  #   ports:
-  #     - "${HOST_CLIENT_PORT}:${CONTAINER_CLIENT_PORT}"
-  #   volumes:
-  #     - ./flutter:/app # Hotload client code changes
+  client:
+    build: ./flutter
+    depends_on:
+      - server
+    environment:
+      CONTAINER_SERVER_PORT: ${CONTAINER_SERVER_PORT}
+    volumes:
+      - ./flutter:/app # Hotload client code changes
+    ports:
+      - "${HOST_CLIENT_PORT}:${CONTAINER_CLIENT_PORT}"
     
 volumes:
   mongodb_data:
