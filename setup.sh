@@ -12,6 +12,9 @@ read -p "Enter your OpenAI API Key: " openai_key
 # Replace the placeholder with the actual OpenAI API key in the .env file
 sed -i -e "s/YOUR_API_KEY/$openai_key/g" .env
 
+# FOR MACOS: If you are using a Mac, replace the sed command line with this one:
+# sed -i "" -e "s/YOUR_API_KEY/$openai_key/g" .env
+
 # Run the openssl commands
 openssl rand -base64 756 > mongo-keyfile
 chmod 600 mongo-keyfile

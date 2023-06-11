@@ -51,8 +51,12 @@ def create_app():
         summaries = []
         for id in data["ids"]:
             item_dict = MongoDbClientSingleton.get_file_system_item(id)
-            index_ids.append(item_dict["index_id"])
-            summaries.append(item_dict["summary"])
+            index_id = item_dict["index_id"]
+            summary = item_dict["summary"]
+            if id is None or summary is None:
+                continue
+            index_ids.append(index_id)
+            summaries.append(summary)
 
         indices = StorageContextSingleton.get_indices(index_ids)
 

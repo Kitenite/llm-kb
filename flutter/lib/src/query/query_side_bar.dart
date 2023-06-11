@@ -25,6 +25,13 @@ class QuerySideBar extends HookWidget {
     selectedItems.value = [...selectedItems.value, ...allItems];
   }
 
+  Icon getCheckedIcon(bool selected) {
+    return Icon(
+      selected ? Icons.check_box : Icons.check_box_outline_blank,
+      color: selected ? Colors.blue : null,
+    );
+  }
+
   // Recursive function to build the directory structure
   Widget buildDirectory(BuildContext context, FileTreeNode root,
       [double padding = 16.0]) {
@@ -47,10 +54,7 @@ class QuerySideBar extends HookWidget {
                     iconColor: Theme.of(context).iconTheme.color,
                     title: ListTile(
                       contentPadding: EdgeInsets.only(left: padding),
-                      leading: FileSystemItem.getIconForFileSystemItem(
-                        entry.value.item,
-                        isOutlined: !isItemSelected(entry.value),
-                      ),
+                      leading: getCheckedIcon(isItemSelected(entry.value)),
                       title: Text(entry.value.item.name),
                       selected: isItemSelected(entry.value),
                       onTap: () {
@@ -63,9 +67,7 @@ class QuerySideBar extends HookWidget {
                   )
                 : ListTile(
                     contentPadding: EdgeInsets.only(left: padding + 16),
-                    leading: FileSystemItem.getIconForFileSystemItem(
-                        entry.value.item,
-                        isOutlined: !isItemSelected(entry.value)),
+                    leading: getCheckedIcon(isItemSelected(entry.value)),
                     title: Text(entry.value.item.name),
                     selected: isItemSelected(entry.value),
                     onTap: () {
