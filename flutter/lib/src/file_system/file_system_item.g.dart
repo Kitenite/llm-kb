@@ -44,4 +44,5 @@ const _$FileSystemItemTypeEnumMap = {
   FileSystemItemType.directory: 'directory',
   FileSystemItemType.pdf: 'pdf',
   FileSystemItemType.link: 'link',
+  FileSystemItemType.github: 'github',
 };

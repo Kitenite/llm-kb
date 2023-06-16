@@ -7,7 +7,6 @@ class StorageContextSingleton:
     @classmethod
     def get_context(cls):
         persist_dir = os.getenv("CONTEXT_STORAGE_DIR")
-        print(persist_dir, file=sys.stderr)
         return StorageContext.from_defaults(persist_dir=persist_dir)
 
     @classmethod

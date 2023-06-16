@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kb_ui/src/file_system/file_system_item.dart';
 import 'package:kb_ui/src/uploader/file_uploader.dart';
+import 'package:kb_ui/src/uploader/github_uploader.dart';
 import 'package:kb_ui/src/uploader/link_uploader.dart';
 
-enum DataSourceType {
-  file,
-  link,
-}
+enum DataSourceType { file, link, github }
 
 class DataIngestionCreateView extends HookWidget {
   final FileSystemItem item;
@@ -36,12 +34,6 @@ class DataIngestionCreateView extends HookWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    dataSource.value = DataSourceType.file;
-                  },
-                  child: const Text('File upload'),
-                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -49,7 +41,52 @@ class DataIngestionCreateView extends HookWidget {
                   onPressed: () {
                     dataSource.value = DataSourceType.link;
                   },
-                  child: const Text('Link upload'),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: const [
+                      Icon(Icons.link), // replace with your desired icon
+                      SizedBox(
+                          width:
+                              10), // provide some horizontal space between icon and text
+                      Text('Link'),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    dataSource.value = DataSourceType.file;
+                  },
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: const [
+                      Icon(Icons.upload_file), // replace with your desired icon
+                      SizedBox(
+                          width:
+                              10), // provide some horizontal space between icon and text
+                      Text('File'),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    dataSource.value = DataSourceType.github;
+                  },
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: const [
+                      Icon(Icons.code), // replace with your desired icon
+                      SizedBox(
+                          width:
+                              10), // provide some horizontal space between icon and text
+                      Text('Github'),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -68,6 +105,8 @@ class DataIngestionCreateView extends HookWidget {
                     return FileUploader(item: item);
                   case DataSourceType.link:
                     return LinkUploader(item: item);
+                  case DataSourceType.github:
+                    return GithubUploader(item: item);
                 }
               },
             ),

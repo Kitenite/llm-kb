@@ -1,9 +1,14 @@
+# Flask
 flask
-langchain
-llama-index==0.6.18
-weaviate-client
-pymongo
 flask_cors
 flask_socketio
 eventlet
-html2text
+
+# Indexing
+langchain
+llama-index==0.6.18
+llama_hub
+pymongo
+trafilatura
+httpx
+# weaviate-client

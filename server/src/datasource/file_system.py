@@ -8,6 +8,7 @@ class FileType(Enum):
     PDF = "pdf"
     LINK = "link"
     DIRECTORY = "directory"
+    GITHUB = "github"
     GENERIC = "generic"
 
 
@@ -47,6 +48,8 @@ class File:
             return PdfFile.from_dict(data)
         elif file_type == FileType.LINK:
             return LinkFile.from_dict(data)
+        elif file_type == FileType.GITHUB:
+            return GithubFile.from_dict(data)
         else:
             return File.from_dict(data)
 
@@ -112,6 +115,33 @@ class PdfFile(File):
 class LinkFile(File):
     def __init__(self, url: str, **kwargs):
         super().__init__(type=FileType.LINK, **kwargs)
+        self.url = url
+
+    def to_dict(self) -> dict:
+        result = super().to_dict()
+        result["url"] = self.url
+        return result
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            url=data["url"],
+            id=data["id"],
+            name=data["name"],
+            parent_id=data["parent_id"],
+            path=data["path"],
+            created_at=datetime.fromisoformat(data["created_at"]),
+            updated_at=datetime.fromisoformat(data["updated_at"]),
+            tags=data["tags"],
+            processed=data["processed"],
+            index_id=data.get("index_id"),
+            summary=data.get("summary"),
+        )
+
+
+class GithubFile(File):
+    def __init__(self, url: str, **kwargs):
+        super().__init__(type=FileType.GITHUB, **kwargs)
         self.url = url
 
     def to_dict(self) -> dict:

@@ -8,6 +8,7 @@ enum FileSystemItemType {
   directory,
   pdf,
   link,
+  github,
 }
 
 @JsonSerializable(explicitToJson: true, fieldRename: FieldRename.snake)
@@ -45,6 +46,7 @@ class FileSystemItem {
   bool get isDirectory => type == FileSystemItemType.directory;
   bool get isPdf => type == FileSystemItemType.pdf;
   bool get isLink => type == FileSystemItemType.link;
+  bool get isGithub => type == FileSystemItemType.github;
   bool get isRoot => (type == FileSystemItemType.directory && id == '-1');
 
   static FileSystemItem createFromAnotherFileSystemItem(
@@ -122,7 +124,10 @@ class FileSystemItem {
             isOutlined ? Icons.picture_as_pdf_outlined : Icons.picture_as_pdf;
         break;
       case FileSystemItemType.link:
-        iconData = isOutlined ? Icons.link : Icons.link;
+        iconData = isOutlined ? Icons.link_outlined : Icons.link;
+        break;
+      case FileSystemItemType.github:
+        iconData = isOutlined ? Icons.code_outlined : Icons.code;
         break;
       default:
         iconData = isOutlined
